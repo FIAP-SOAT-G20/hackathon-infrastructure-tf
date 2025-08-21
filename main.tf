@@ -37,7 +37,7 @@ module "rds_instance" {
   environment = var.environment
   db_username = var.rds_db_username
   db_password = var.rds_db_password
-  subnet_ids  = module.eks_instance.subnet_ids
+  subnet_ids  = module.eks_instance.private_subnet_ids
   vpc_id      = module.eks_instance.vpc_id
 
   depends_on = [module.eks_instance]

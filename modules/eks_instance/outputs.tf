@@ -7,23 +7,27 @@ output "cluster_endpoint" {
 }
 
 output "vpc_arn" {
-  value = data.aws_vpc.vpc.arn
+  value = aws_vpc.hackathon_vpc.arn
 }
 
 output "vpc_id" {
-  value = data.aws_vpc.vpc.id
+  value = aws_vpc.hackathon_vpc.id
 }
 
 output "vpc_cidr" {
-  value = data.aws_vpc.vpc.cidr_block
+  value = aws_vpc.hackathon_vpc.cidr_block
 }
 
 output "security_group_id" {
   value = aws_security_group.sg.id
 }
 
-output "subnet_ids" {
-  value = [for subnet in data.aws_subnet.subnet : subnet.id if subnet.availability_zone != "${var.region}e"]
+output "private_subnet_ids" {
+  value = aws_subnet.private[*].id
+}
+
+output "public_subnet_ids" {
+  value = aws_subnet.public[*].id
 }
 
 output "lab_role_arn" {

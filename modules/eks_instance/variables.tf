@@ -3,11 +3,11 @@ variable "region" {
 }
 
 variable "project_name" {
-  default = "ff-tech-challenge-eks-cluster"
+  default = "hackathon-eks-cluster"
 }
 
 variable "lab_role" {
-  default = "arn:aws:iam::829401394278:role/LabRole"
+  default = "arn:aws:iam::618427392221:role/LabRole"
 }
 
 variable "access_config" {
@@ -23,7 +23,7 @@ variable "instance_type" {
 }
 
 variable "principal_arn" {
-  default = "arn:aws:iam::829401394278:role/voclabs"
+  default = "arn:aws:iam::618427392221:role/voclabs"
 }
 
 variable "policy_arn" {

@@ -40,7 +40,7 @@ resource "aws_db_instance" "postgres_hackathon" {
   vpc_security_group_ids  = [aws_security_group.rds_sg.id]
   publicly_accessible     = true
   skip_final_snapshot     = true
-  identifier              = "video_10soat_g21_hackathon"
+  identifier              = "video-10soat-g21-hackathon"
   backup_retention_period = 7  
   multi_az                = false
   storage_type            = "gp3"

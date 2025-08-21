@@ -1,4 +1,4 @@
-AWS_EKS_CLUSTER_NAME=ff-tech-challenge-eks-cluster
+AWS_EKS_CLUSTER_NAME=hackathon-eks-cluster
 
 # Looks at comments using ## on targets and uses them to produce a help output.
 .PHONY: help

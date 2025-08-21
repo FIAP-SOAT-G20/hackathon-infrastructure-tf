@@ -1,8 +1,7 @@
 resource "aws_security_group" "sg" {
   name   = "${var.project_name}-sg"
-  vpc_id = data.aws_vpc.vpc.id
+  vpc_id = aws_vpc.hackathon_vpc.id
 
-  # Inbound
   ingress {
     description = "HTTP"
     from_port   = 80
@@ -11,7 +10,6 @@ resource "aws_security_group" "sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Outbound
   egress {
     description = "All"
     from_port   = 0
