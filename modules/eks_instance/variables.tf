@@ -38,8 +38,8 @@ variable "cidr_block" {
 variable "tags" {
   type = map(string)
   default = {
-    Name        = "tech-challenge-3-k8s"
+    Name        = "hackathon-k8s"
     Environment = "dev"
-    Project     = "tech-challenge"
+    Project     = "hackathon"
   }
 }

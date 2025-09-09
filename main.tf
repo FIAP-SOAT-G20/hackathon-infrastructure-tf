@@ -42,3 +42,14 @@ module "rds_instance" {
 
   depends_on = [module.eks_instance]
 }
+
+module "alb_instance" {
+  source = "./modules/alb_instance"
+
+  project_name = var.project_name
+  vpc_id       = module.eks_instance.vpc_id
+  subnet_ids   = module.eks_instance.public_subnet_ids
+  common_tags  = var.common_tags
+
+  depends_on = [module.eks_instance]
+}
