@@ -95,6 +95,9 @@ locals {
       key == "video-status-notification.fifo" ? {
         sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"],
       } : {},
+      key == "video-status-updated.fifo" ? {
+        sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"],
+      } : {},
       key == "video-uploaded" ? {
         s3_bucket_arn = "arn:aws:s3:::${var.s3_bucket_video_processor_raw_videos}",
       } : {}

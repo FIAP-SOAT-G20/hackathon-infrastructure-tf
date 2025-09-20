@@ -119,6 +119,17 @@ variable "sqs_queues" {
         Purpose = "Receives an event from SNS when a video has its status updated and sends a notification to users"
       }
     }
+    "video-status-updated.fifo" = {
+      name                        = "video-status-updated.fifo"
+      delay_seconds               = 0
+      message_retention_seconds   = 1209600 # 14 days
+      visibility_timeout_seconds  = 60
+      fifo_queue                  = true
+      content_based_deduplication = true
+      tags = {
+        Purpose = "Receives events when video status is updated"
+      }
+    }
   }
 }
 
