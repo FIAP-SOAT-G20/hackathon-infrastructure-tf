@@ -80,3 +80,22 @@ module "lambda_instance" {
 
   depends_on = [module.eks_instance]
 }
+
+module "sns_instance" {
+  source = "./modules/sns_instance"
+
+  project_name = var.project_name
+  environment = var.environment
+  sns_topics = var.sns_topics
+}
+
+module "sqs_instance" {
+  source = "./modules/sqs_instance"
+
+  project_name = var.project_name
+  environment = var.environment
+  sqs_queues = var.sqs_queues
+
+  depends_on = [module.sns_instance]
+}
+

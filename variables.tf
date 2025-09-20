@@ -82,3 +82,59 @@ variable "lambda_timeout" {
   type        = number
   default     = 60
 }
+
+
+variable "sqs_queues" {
+  description = "Map of SQS queue configurations"
+  type = map(object({
+    name                        = string
+    delay_seconds               = number
+    message_retention_seconds   = number
+    visibility_timeout_seconds  = number
+    fifo_queue                  = optional(bool)
+    content_based_deduplication = optional(bool)
+    tags                        = optional(map(string))
+    sns_topic_arn               = optional(string)
+  }))
+  default = {
+    "video-uploaded" = {
+      name                        = "video-uploaded"
+      delay_seconds               = 0
+      message_retention_seconds   = 1209600 # 14 days
+      visibility_timeout_seconds  = 60
+      fifo_queue                  = false
+      content_based_deduplication = true
+      tags = {
+        Purpose = "Receives an event from S3 when a video is uploaded"
+      }
+    }
+    "notification" = {
+      name                        = "notification"
+      delay_seconds               = 0
+      message_retention_seconds   = 1209600 # 14 days
+      visibility_timeout_seconds  = 60
+      fifo_queue                  = true
+      content_based_deduplication = true
+      sns_topic_arn               = "arn:aws:sns:us-east-1:905417995957:video-status-updated"
+      tags = {
+        Purpose = "Receives an event from SNS when a video has it's status updated and sends a notification to users"
+      }
+    }
+  }
+}
+
+variable "sns_topics" {
+  description = "Map of SNS topic configurations"
+  type = map(object({
+    name = string
+    tags = optional(map(string))
+  }))
+  default = {
+    "video-status-updated" = {
+      name = "video-status-updated"
+      tags = { 
+        Purpose = "Sends a notification to users when a video has it's status updated"
+      }
+    }
+  }
+}
