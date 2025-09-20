@@ -1,7 +1,7 @@
 resource "aws_eks_node_group" "eks-node" {
   cluster_name    = aws_eks_cluster.eks-cluster.name
   node_group_name = var.node_group
-  node_role_arn   = var.lab_role
+  node_role_arn   = data.aws_iam_role.fiap_lab_role.arn
   subnet_ids      = aws_subnet.private[*].id
   instance_types  = [var.instance_type]
 
@@ -18,7 +18,7 @@ resource "aws_eks_node_group" "eks-node" {
 
 resource "aws_eks_cluster" "eks-cluster" {
   name     = var.project_name
-  role_arn = var.lab_role
+  role_arn = data.aws_iam_role.fiap_lab_role.arn
 
   vpc_config {
     subnet_ids              = aws_subnet.private[*].id
