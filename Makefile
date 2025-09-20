@@ -24,7 +24,7 @@ tf-apply: ## Apply Terraform
 
 .PHONY: tf-destroy
 tf-destroy: ## Destroy Terraform resources
-	@echo  "🔴 Destroying Terraform resources...
+	@echo  "🔴 Destroying Terraform resources..."
 	terraform destroy -auto-approve
 
 
