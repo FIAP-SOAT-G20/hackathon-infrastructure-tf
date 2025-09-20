@@ -7,6 +7,11 @@ help: ## Print this message
 	@echo "Usage: make <command>"
 	@awk -F '::? .*## ' -- "/^[^':]+::? .*## /"' { printf "  make '$$(tput bold)'%-$(ALIGN)s'$$(tput sgr0)' - %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
+.PHONY: validate
+validate: ## Validate Terraform configuration
+	@echo  "🟢 Validating Terraform configuration..."
+	terraform validate
+
 .PHONY: tf-init
 tf-init: ## Initialize Terraform
 	@echo  "🟢 Initializing Terraform..."
