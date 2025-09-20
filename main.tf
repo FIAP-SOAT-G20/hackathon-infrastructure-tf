@@ -78,7 +78,6 @@ module "lambda_instance" {
   lambda_memory = var.lambda_memory
   lambda_timeout = var.lambda_timeout
 
-  depends_on = [module.eks_instance]
 }
 
 module "sns_instance" {
