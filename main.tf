@@ -110,8 +110,8 @@ module "s3_instance" {
   aws_region  = var.aws_region
   environment = var.environment
   s3_bucket_name = var.s3_bucket_video_processor_raw_videos
-  sqs_queue_arn = module.sqs_instance.sqs_queue_arns[var.sqs_queues["video-uploaded"].name]
-  sqs_queue_url = module.sqs_instance.sqs_queue_urls[var.sqs_queues["video-uploaded"].name] 
+  sqs_queue_arn = module.sqs_instance.sqs_queue_arns["video-uploaded"]
+  sqs_queue_url = module.sqs_instance.sqs_queue_urls["video-uploaded"] 
 
   depends_on = [module.sqs_instance]
 }
