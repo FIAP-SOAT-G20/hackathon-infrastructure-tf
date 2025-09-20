@@ -68,3 +68,54 @@ module "elasticache_instance" {
 
   depends_on = [module.eks_instance]
 }
+
+module "lambda_instance" {
+  source = "./modules/lambda"
+
+  project_name = var.project_name
+  environment = var.environment
+  lambda_image_uri = var.lambda_image_uri
+  lambda_memory = var.lambda_memory
+  lambda_timeout = var.lambda_timeout
+
+}
+
+module "s3_instance" {
+  source = "./modules/s3_instance"
+
+  aws_region  = var.aws_region
+  environment = var.environment
+  s3_bucket_name = var.s3_bucket_video_processor_raw_videos
+}
+
+
+module "sns_instance" {
+  source = "./modules/sns_instance"
+
+  environment = var.environment
+  topic_names = var.sns_topics
+}
+
+locals {
+  transformed_sqs_queues = {
+    for key, value in var.sqs_queues :
+    key => merge(value, key == "video-uploaded" ? { 
+      s3_bucket_arn = module.s3_instance.s3_bucket_arn
+    } : key == "video-status-notification.fifo" ? {
+      sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"],
+    } : {}
+    )
+  }
+}
+
+module "sqs_instance" {
+  source = "./modules/sqs_instance"
+
+  environment = var.environment
+  sqs_queues = local.transformed_sqs_queues
+
+  depends_on = [module.sns_instance, module.s3_instance]
+}
+
+
+
