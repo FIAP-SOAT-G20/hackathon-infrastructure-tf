@@ -142,7 +142,7 @@ variable "sns_topics" {
   default = {
     "video-status-updated" = {
       name = "video-status-updated"
-      tags = { 
+      tags = {
         Purpose = "Sends a notification to users when a video has its status updated"
       }
     }
@@ -151,6 +151,6 @@ variable "sns_topics" {
 
 variable "s3_bucket_video_processor_raw_videos" {
   description = "Map of S3 bucket configurations"
-  type = string
-  default = "fiapx-10soat-g21"
+  type        = string
+  default     = "fiapx-10soat-g21"
 }
