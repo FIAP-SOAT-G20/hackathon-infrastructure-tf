@@ -16,11 +16,14 @@ resource "aws_sqs_queue" "queues" {
 }
 
 resource "aws_sqs_queue_policy" "sns_to_sqs" {
-  for_each = var.sqs_queues
+  for_each = {
+    for key, value in var.sqs_queues : key => value
+    if value.sns_topic_arn != null && value.sns_topic_arn != ""
+  }
   
   queue_url = aws_sqs_queue.queues[each.key].id
 
-  policy = each.value.sns_topic_arn != null && each.value.sns_topic_arn != "" ? jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -37,7 +40,19 @@ resource "aws_sqs_queue_policy" "sns_to_sqs" {
           }
         }
       }
-    ]}) : each.value.s3_bucket_arn != null && each.value.s3_bucket_arn != "" ? jsonencode({
+    ]
+  })
+}
+
+resource "aws_sqs_queue_policy" "s3_to_sqs" {
+  for_each = {
+    for key, value in var.sqs_queues : key => value
+    if value.s3_bucket_arn != null && value.s3_bucket_arn != ""
+  }
+  
+  queue_url = aws_sqs_queue.queues[each.key].id
+
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -54,9 +69,6 @@ resource "aws_sqs_queue_policy" "sns_to_sqs" {
           }
         }
       }
-    ]    
-  }) : jsonencode({
-    Version = "2012-10-17"
-    Statement = []
+    ]
   })
 }
