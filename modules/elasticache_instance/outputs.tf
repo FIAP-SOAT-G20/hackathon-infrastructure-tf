@@ -5,9 +5,7 @@ output "elasticache_cluster_id" {
 
 output "elasticache_cluster_address" {
   description = "ElastiCache cluster address"
-  value       = var.engine == "redis" ? (
-    length(aws_elasticache_cluster.main.cache_nodes) > 0 ? aws_elasticache_cluster.main.cache_nodes[0].address : null
-  ) : aws_elasticache_cluster.main.cluster_address
+  value       = var.engine == "redis" && length(aws_elasticache_cluster.main.cache_nodes) > 0 ? aws_elasticache_cluster.main.cache_nodes[0].address : aws_elasticache_cluster.main.cluster_address
 }
 
 output "elasticache_cluster_port" {
