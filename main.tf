@@ -53,3 +53,18 @@ module "alb_instance" {
 
   depends_on = [module.eks_instance]
 }
+
+module "elasticache_instance" {
+  source = "./modules/elasticache_instance"
+
+  project_name = var.project_name
+  environment  = var.environment
+  vpc_id       = module.eks_instance.vpc_id
+  subnet_ids   = module.eks_instance.private_subnet_ids
+  engine       = var.elasticache_engine
+  node_type    = var.elasticache_node_type
+  port         = var.elasticache_port
+  common_tags  = var.common_tags
+
+  depends_on = [module.eks_instance]
+}

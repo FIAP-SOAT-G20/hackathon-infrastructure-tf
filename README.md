@@ -4,7 +4,7 @@
 [![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
 [![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
 
-This repository contains Terraform infrastructure code for the FIAP PostTech Hackathon project. It provisions a complete AWS cloud infrastructure including an EKS cluster, RDS PostgreSQL database, and Application Load Balancer (ALB) with best practices for security, scalability, and maintainability.
+This repository contains Terraform infrastructure code for the FIAP PostTech Hackathon project. It provisions a complete AWS cloud infrastructure including an EKS cluster, RDS PostgreSQL database, ElastiCache Redis cluster, and Application Load Balancer (ALB) with best practices for security, scalability, and maintainability.
 
 ## 📋 Table of Contents
 
@@ -23,6 +23,7 @@ This infrastructure includes the following AWS components:
 
 - **Amazon EKS (Elastic Kubernetes Service)**: Managed Kubernetes cluster for container orchestration
 - **Amazon RDS PostgreSQL**: Managed relational database service
+- **Amazon ElastiCache Redis**: Managed in-memory caching service for improved application performance
 - **Application Load Balancer (ALB)**: Load balancer for distributing incoming traffic
 - **VPC with Public/Private Subnets**: Network isolation and security
 - **Security Groups**: Network access control
@@ -45,7 +46,8 @@ This infrastructure includes the following AWS components:
 │  │                 │              │                 │      │
 │  │   EKS Nodes     │              │   EKS Nodes     │      │
 │  │                 │              │                 │      │
-│  │   RDS Instance  │              │   RDS Instance  │      │
+│  │   RDS Instance  │              │  ElastiCache    │      │
+│  │                 │              │                 │      │
 │  └─────────────────┘              └─────────────────┘      │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -66,6 +68,7 @@ Your AWS credentials should have permissions for:
 - EC2 (VPC, Subnets, Security Groups, Load Balancers)
 - EKS (Cluster management, Node groups)
 - RDS (Database instances)
+- ElastiCache (Cache clusters, Subnet groups, Parameter groups)
 - IAM (Roles and policies for EKS)
 - S3 (For Terraform state backend)
 
@@ -94,6 +97,12 @@ Your AWS credentials should have permissions for:
     │   ├── sg.tf
     │   ├── variables.tf
     │   └── vpc.tf
+    ├── elasticache_instance/ # ElastiCache Redis module
+    │   ├── main.tf
+    │   ├── outputs.tf
+    │   ├── provider.tf
+    │   ├── sg.tf
+    │   └── variables.tf
     └── rds_instance/         # RDS PostgreSQL module
         ├── main.tf
         ├── outputs.tf
@@ -114,6 +123,9 @@ The infrastructure supports different environments through variables:
 | `common_tags` | Common tags for all resources | See variables.tf | No |
 | `rds_db_username` | RDS master username | `postgres` | No |
 | `rds_db_password` | RDS master password | `postgres` | Yes* |
+| `elasticache_engine` | ElastiCache engine (redis/memcached) | `redis` | No |
+| `elasticache_node_type` | ElastiCache node type | `cache.t3.micro` | No |
+| `elasticache_port` | ElastiCache port number | `6379` | No |
 
 *Required in production environments. Use AWS Secrets Manager or similar for production deployments.
 
@@ -203,6 +215,11 @@ common_tags = {
 
 rds_db_username = "admin"
 rds_db_password = "secure-password-here"
+
+# ElastiCache Configuration
+elasticache_engine    = "redis"
+elasticache_node_type = "cache.t3.small"
+elasticache_port      = 6379
 ```
 
 ## 📤 Outputs
@@ -224,6 +241,12 @@ After successful deployment, the following outputs are available:
 ### RDS Database
 - `rds_postgres_hackathon_endpoint`: Database endpoint
 - `rds_postgres_hackathon_db_name`: Database name
+
+### ElastiCache
+- `elasticache_cluster_id`: Cache cluster identifier
+- `elasticache_cluster_address`: Cache cluster endpoint address
+- `elasticache_cluster_port`: Cache cluster port
+- `elasticache_engine`: Cache engine type (redis/memcached)
 
 View outputs after deployment:
 ```bash

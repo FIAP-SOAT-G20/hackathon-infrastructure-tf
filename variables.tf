@@ -41,3 +41,25 @@ variable "rds_db_password" {
   sensitive   = true
   default     = "postgres"
 }
+
+variable "elasticache_engine" {
+  description = "ElastiCache engine (redis or memcached)"
+  type        = string
+  default     = "redis"
+  validation {
+    condition     = contains(["redis", "memcached"], var.elasticache_engine)
+    error_message = "Engine must be either 'redis' or 'memcached'."
+  }
+}
+
+variable "elasticache_node_type" {
+  description = "ElastiCache node type"
+  type        = string
+  default     = "cache.t3.micro"
+}
+
+variable "elasticache_port" {
+  description = "Port number for ElastiCache"
+  type        = number
+  default     = 6379
+}

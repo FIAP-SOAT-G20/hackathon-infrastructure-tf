@@ -51,3 +51,24 @@ output "rds_postgres_hackathon_db_name" {
   description = "Database name of the hackathon RDS instance"
   value       = module.rds_instance.rds_postgres_hackathon_db_name
 }
+
+# ElastiCache Outputs
+output "elasticache_cluster_id" {
+  description = "ElastiCache cluster ID"
+  value       = module.elasticache_instance.elasticache_cluster_id
+}
+
+output "elasticache_cluster_address" {
+  description = "ElastiCache cluster address"
+  value       = module.elasticache_instance.elasticache_cluster_address
+}
+
+output "elasticache_cluster_port" {
+  description = "ElastiCache cluster port"
+  value       = module.elasticache_instance.elasticache_cluster_port
+}
+
+output "elasticache_engine" {
+  description = "ElastiCache engine"
+  value       = module.elasticache_instance.elasticache_engine
+}
