@@ -60,6 +60,12 @@ variable "parameter_group_name" {
   default     = null
 }
 
+variable "parameter_group_family" {
+  description = "Family of the parameter group (e.g., redis7.x, memcached1.6)"
+  type        = string
+  default     = null
+}
+
 variable "engine_version" {
   description = "Version number of the cache engine"
   type        = string
