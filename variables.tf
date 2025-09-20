@@ -24,8 +24,10 @@ variable "common_tags" {
   description = "Common tags to apply to all resources"
   type        = map(string)
   default = {
-    Project   = "hackathon"
-    Terraform = "true"
+    Project     = "hackathon"
+    Terraform   = "true"
+    Environment = "prod"
+    Region      = "us-east-1"
   }
 }
 
@@ -62,4 +64,21 @@ variable "elasticache_port" {
   description = "Port number for ElastiCache"
   type        = number
   default     = 6379
+}
+variable "lambda_image_uri" {
+  description = "URI of the Lambda container image"
+  type        = string
+  default     = "905417995957.dkr.ecr.us-east-1.amazonaws.com/hackathon-lambda-job-starter:latest"
+}
+
+variable "lambda_memory" {
+  description = "Lambda memory in MB"
+  type        = number
+  default     = 512
+}
+
+variable "lambda_timeout" {
+  description = "Lambda timeout in seconds"
+  type        = number
+  default     = 60
 }

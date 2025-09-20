@@ -68,3 +68,15 @@ module "elasticache_instance" {
 
   depends_on = [module.eks_instance]
 }
+
+module "lambda_instance" {
+  source = "./modules/lambda"
+
+  project_name = var.project_name
+  environment = var.environment
+  lambda_image_uri = var.lambda_image_uri
+  lambda_memory = var.lambda_memory
+  lambda_timeout = var.lambda_timeout
+
+  depends_on = [module.eks_instance]
+}
