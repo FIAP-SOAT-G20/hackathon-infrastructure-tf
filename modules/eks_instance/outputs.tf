@@ -34,10 +34,6 @@ output "lab_role_arn" {
   value = data.aws_iam_role.fiap_lab_role.arn
 }
 
-output "principal_arn" {
-  value = data.aws_iam_role.voclabs_role.arn
-}
-
 output "cluster_ca_certificate" {
   value = aws_eks_cluster.eks-cluster.certificate_authority[0].data
 }

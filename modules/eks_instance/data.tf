@@ -2,10 +2,6 @@ data "aws_iam_role" "fiap_lab_role" {
   name = "LabRole"
 }
 
-data "aws_iam_role" "voclabs_role" {
-  name = "voclabs"
-}
-
 data "aws_eks_cluster" "eks_cluster" {
   name       = var.project_name
   depends_on = [aws_eks_cluster.eks-cluster]
