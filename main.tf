@@ -72,11 +72,11 @@ module "elasticache_instance" {
 module "lambda_instance" {
   source = "./modules/lambda"
 
-  project_name = var.project_name
-  environment = var.environment
+  project_name     = var.project_name
+  environment      = var.environment
   lambda_image_uri = var.lambda_image_uri
-  lambda_memory = var.lambda_memory
-  lambda_timeout = var.lambda_timeout
+  lambda_memory    = var.lambda_memory
+  lambda_timeout   = var.lambda_timeout
 
 }
 
@@ -91,9 +91,13 @@ module "sns_instance" {
 locals {
   transformed_sqs_queues = {
     for key, value in var.sqs_queues :
-    key => merge(value, key == "video-status-notification.fifo" ? {
-      sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"],
-    } : {}
+    key => merge(value,
+      key == "video-status-notification.fifo" ? {
+        sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"],
+      } : {},
+      key == "video-uploaded" ? {
+        s3_bucket_arn = "arn:aws:s3:::${var.s3_bucket_video_processor_raw_videos}",
+      } : {}
     )
   }
 }
@@ -102,7 +106,7 @@ module "sqs_instance" {
   source = "./modules/sqs_instance"
 
   environment = var.environment
-  sqs_queues = local.transformed_sqs_queues
+  sqs_queues  = local.transformed_sqs_queues
 
   depends_on = [module.sns_instance]
 }
@@ -111,10 +115,11 @@ module "sqs_instance" {
 module "s3_instance" {
   source = "./modules/s3_instance"
 
-  aws_region  = var.aws_region
-  environment = var.environment
-  s3_bucket_name = var.s3_bucket_video_processor_raw_videos
-  sqs_queue_arn = module.sqs_instance.sqs_queue_arns["video-uploaded"]
+  aws_region                  = var.aws_region
+  environment                 = var.environment
+  s3_bucket_name              = var.s3_bucket_video_processor_raw_videos
+  sqs_queue_arn               = module.sqs_instance.sqs_queue_arns["video-uploaded"]
+  sqs_queue_policy_dependency = module.sqs_instance.s3_to_sqs_policies
 
   depends_on = [module.sqs_instance]
 }

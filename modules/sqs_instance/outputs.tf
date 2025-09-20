@@ -13,3 +13,11 @@ output "sqs_queue_arns" {
     key => queue.arn
   }
 }
+
+output "s3_to_sqs_policies" {
+  description = "Map of S3-to-SQS policies for dependency management"
+  value = {
+    for key, policy in aws_sqs_queue_policy.s3_to_sqs :
+    key => policy.id
+  }
+}
