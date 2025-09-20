@@ -63,3 +63,51 @@ variable "elasticache_port" {
   type        = number
   default     = 6379
 }
+
+variable "sqs_queues" {
+  description = "Map of SQS queue configurations"
+  type = map(object({
+    name                        = string
+    delay_seconds               = number
+    message_retention_seconds   = number
+    visibility_timeout_seconds  = number
+    fifo_queue                  = optional(bool)
+    content_based_deduplication = optional(bool)
+    tags                        = optional(map(string))
+  }))
+  default = {
+    "video_updated_queue" = {
+      name                        = "video-updated"
+      delay_seconds               = 0
+      message_retention_seconds   = 1209600 # 14 days
+      visibility_timeout_seconds  = 60
+      fifo_queue                  = false
+      content_based_deduplication = false
+      tags = {
+        Purpose = "Order Notifications"
+      }
+    }
+    "video_upload_queue" = {
+      name                        = "video-uploaded"
+      delay_seconds               = 0
+      message_retention_seconds   = 1209600 # 14 days
+      visibility_timeout_seconds  = 60
+      fifo_queue                  = false
+      content_based_deduplication = false
+      tags = {
+        Purpose = "Kitchen Notifications"
+      }
+    }
+    "notification_queue" = {
+      name                        = "notification"
+      delay_seconds               = 0
+      message_retention_seconds   = 1209600 # 14 days
+      visibility_timeout_seconds  = 60
+      fifo_queue                  = false
+      content_based_deduplication = false
+      tags = {
+        Purpose = "Kitchen Notifications"
+      }
+    }
+  }
+}
