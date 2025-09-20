@@ -60,4 +60,4 @@ jobs:
           TF_VAR_rds_db_password: ${{ secrets.RDS_DB_PASSWORD }}
           TF_VAR_rds_db_username: ${{ secrets.RDS_DB_USERNAME }}
         if: env.TF_VAR_jwt_secret != '' && env.TF_VAR_rds_db_password != '' && env.TF_VAR_rds_db_username != ''
-        run: terraform apply -input=false -auto-approve
+        run: terraform apply -input=false -auto-approve tfplan
