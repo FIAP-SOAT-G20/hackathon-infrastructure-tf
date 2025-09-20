@@ -88,3 +88,14 @@ output "s3_bucket_id" {
   description = "ID of the S3 bucket"
   value       = module.s3_instance.s3_bucket_id
 }
+
+# SQS Outputs
+output "sqs_queue_urls" {
+  description = "Map of SQS queue names to their URLs"
+  value       = module.sqs_instance.sqs_queue_urls
+}
+
+output "sqs_queue_arns" {
+  description = "Map of SQS queue names to their ARNs"
+  value       = module.sqs_instance.sqs_queue_arns
+}
