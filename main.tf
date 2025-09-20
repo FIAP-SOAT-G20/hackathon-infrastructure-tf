@@ -92,7 +92,7 @@ locals {
   transformed_sqs_queues = {
     for key, value in var.sqs_queues :
     key => merge(value,
-      key == "video-status-notification.fifo" ? {
+      key == "video-status-updated.fifo" ? {
         sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"],
       } : {},
       key == "video-uploaded" ? {
