@@ -83,18 +83,36 @@ module "lambda_instance" {
 module "sns_instance" {
   source = "./modules/sns_instance"
 
-  project_name = var.project_name
   environment = var.environment
-  sns_topics = var.sns_topics
+  topic_names = var.sns_topics
+  
+}
+
+locals {
+  transformed_sqs_queues = {
+    for key, value in var.sqs_queues :
+    key => merge(value, key == "video-uploaded" ? { sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"] } : {})
+  }
 }
 
 module "sqs_instance" {
   source = "./modules/sqs_instance"
 
-  project_name = var.project_name
   environment = var.environment
-  sqs_queues = var.sqs_queues
+  sqs_queues = local.transformed_sqs_queues
 
   depends_on = [module.sns_instance]
+}
+
+module "s3_instance" {
+  source = "./modules/s3_instance"
+
+  aws_region  = var.aws_region
+  environment = var.environment
+  s3_bucket_name = var.s3_bucket_video_processor_raw_videos
+  sqs_queue_arn = module.sqs_instance.sqs_queue_arns[var.sqs_queues["video-uploaded"].name]
+  sqs_queue_url = module.sqs_instance.sqs_queue_urls[var.sqs_queues["video-uploaded"].name] 
+
+  depends_on = [module.sqs_instance]
 }
 

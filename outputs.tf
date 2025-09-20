@@ -72,3 +72,19 @@ output "elasticache_engine" {
   description = "ElastiCache engine"
   value       = module.elasticache_instance.elasticache_engine
 }
+
+# S3 Outputs
+output "s3_bucket_name" {
+  description = "Name of the S3 bucket"
+  value       = module.s3_instance.s3_bucket_name
+}
+
+output "s3_bucket_arn" {
+  description = "ARN of the S3 bucket"
+  value       = module.s3_instance.s3_bucket_arn
+}
+
+output "s3_bucket_id" {
+  description = "ID of the S3 bucket"
+  value       = module.s3_instance.s3_bucket_id
+}

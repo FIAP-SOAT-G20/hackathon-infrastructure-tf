@@ -138,3 +138,9 @@ variable "sns_topics" {
     }
   }
 }
+
+variable "s3_bucket_video_processor_raw_videos" {
+  description = "Map of S3 bucket configurations"
+  type = string
+  default = "video-processor-raw-videos"
+}

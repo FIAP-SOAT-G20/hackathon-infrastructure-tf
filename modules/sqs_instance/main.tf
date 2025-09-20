@@ -16,7 +16,11 @@ resource "aws_sqs_queue" "queues" {
 }
 
 resource "aws_sqs_queue_policy" "sns_to_sqs" {
-  for_each  = var.sns_topic_arn != "" ? var.sqs_queues : {}
+  for_each = {
+    for k, v in var.sqs_queues : k => v
+    if v.sns_topic_arn != null && v.sns_topic_arn != ""
+  }
+  
   queue_url = aws_sqs_queue.queues[each.key].id
 
   policy = jsonencode({
@@ -32,7 +36,7 @@ resource "aws_sqs_queue_policy" "sns_to_sqs" {
         Resource = aws_sqs_queue.queues[each.key].arn
         Condition = {
           ArnEquals = {
-            "aws:SourceArn" = var.sns_topic_arn
+            "aws:SourceArn" = each.value.sns_topic_arn
           }
         }
       }

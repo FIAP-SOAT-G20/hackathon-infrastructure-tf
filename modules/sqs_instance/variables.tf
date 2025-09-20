@@ -20,11 +20,6 @@ variable "sqs_queues" {
     fifo_queue                   = optional(bool)
     content_based_deduplication  = optional(bool)
     tags                         = optional(map(string))
+    sns_topic_arn                = optional(string)
   }))
-}
-
-variable "sns_topic_arn" {
-  description = "ARN of the SNS topic that will send messages to the SQS queues"
-  type        = string
-  default     = ""
 }
