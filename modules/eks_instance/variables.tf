@@ -24,12 +24,6 @@ variable "instance_type" {
   default = "t3.medium"
 }
 
-variable "principal_arn" {
-  description = "Principal ARN retrieved dynamically from AWS"
-  type        = string
-  default     = null
-}
-
 variable "policy_arn" {
   default = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
 }
