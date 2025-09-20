@@ -9,7 +9,7 @@ help: ## Print this message
 
 .PHONY: validate
 validate: ## Validate Terraform configuration
-	@echo  "🟢 Validating Terraform configuration...""
+	@echo  "🟢 Validating Terraform configuration..."
 	terraform validate
 
 .PHONY: tf-init
