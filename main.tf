@@ -80,18 +80,31 @@ module "lambda_instance" {
 
 }
 
+module "s3_instance" {
+  source = "./modules/s3_instance"
+
+  aws_region  = var.aws_region
+  environment = var.environment
+  s3_bucket_name = var.s3_bucket_video_processor_raw_videos
+}
+
+
 module "sns_instance" {
   source = "./modules/sns_instance"
 
   environment = var.environment
   topic_names = var.sns_topics
-  
 }
 
 locals {
   transformed_sqs_queues = {
     for key, value in var.sqs_queues :
-    key => merge(value, key == "video-uploaded" ? { sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"] } : {})
+    key => merge(value, key == "video-uploaded" ? { 
+      s3_bucket_arn = module.s3_instance.s3_bucket_arn
+    } : key == "video-status-notification.fifo" ? {
+      sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"],
+    } : {}
+    )
   }
 }
 
@@ -101,19 +114,8 @@ module "sqs_instance" {
   environment = var.environment
   sqs_queues = local.transformed_sqs_queues
 
-  depends_on = [module.sns_instance]
+  depends_on = [module.sns_instance, module.s3_instance]
 }
 
-module "s3_instance" {
-  source = "./modules/s3_instance"
-
-  aws_region  = var.aws_region
-  environment = var.environment
-  s3_bucket_name = var.s3_bucket_video_processor_raw_videos
-  sqs_queue_arn = module.sqs_instance.sqs_queue_arns["video-uploaded"]
-  sqs_queue_url = module.sqs_instance.sqs_queue_urls["video-uploaded"] 
-
-  depends_on = [module.sqs_instance]
-}
 
 

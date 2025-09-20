@@ -37,7 +37,24 @@ resource "aws_sqs_queue_policy" "sns_to_sqs" {
           }
         }
       }
-    ]
+    ]}) : each.value.s3_bucket_arn != null && each.value.s3_bucket_arn != "" ? jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowS3ToSendMessage"
+        Effect = "Allow"
+        Principal = {
+          Service = "s3.amazonaws.com"
+        }
+        Action   = "sqs:SendMessage"
+        Resource = aws_sqs_queue.queues[each.key].arn
+        Condition = {
+          ArnEquals = {
+            "aws:SourceArn" = each.value.s3_bucket_arn
+          }
+        }
+      }
+    ]    
   }) : jsonencode({
     Version = "2012-10-17"
     Statement = []

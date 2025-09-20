@@ -21,5 +21,6 @@ variable "sqs_queues" {
     content_based_deduplication  = optional(bool)
     tags                         = optional(map(string))
     sns_topic_arn                = optional(string)
+    s3_bucket_arn                = optional(string)
   }))
 }

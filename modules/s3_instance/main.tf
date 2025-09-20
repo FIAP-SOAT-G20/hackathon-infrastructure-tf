@@ -14,27 +14,3 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
     events    = ["s3:ObjectCreated:*"]
   }
 }
-
-resource "aws_sqs_queue_policy" "s3_to_sqs" {
-  queue_url = var.sqs_queue_url
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowS3ToSendMessage"
-        Effect = "Allow"
-        Principal = {
-          Service = "s3.amazonaws.com"
-        }
-        Action   = "sqs:SendMessage"
-        Resource = var.sqs_queue_arn
-        Condition = {
-          ArnEquals = {
-            "aws:SourceArn" = aws_s3_bucket.bucket.arn
-          }
-        }
-      }
-    ]
-  })
-}
