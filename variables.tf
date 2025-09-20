@@ -116,7 +116,7 @@ variable "sqs_queues" {
       fifo_queue                  = true
       content_based_deduplication = true
       tags = {
-        Purpose = "Receives an event from SNS when a video has it's status updated and sends a notification to users"
+        Purpose = "Receives an event from SNS when a video has its status updated and sends a notification to users"
       }
     }
   }
@@ -132,7 +132,7 @@ variable "sns_topics" {
     "video-status-updated" = {
       name = "video-status-updated"
       tags = { 
-        Purpose = "Sends a notification to users when a video has it's status updated"
+        Purpose = "Sends a notification to users when a video has its status updated"
       }
     }
   }
