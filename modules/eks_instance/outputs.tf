@@ -35,14 +35,14 @@ output "lab_role_arn" {
 }
 
 output "principal_arn" {
-  value = var.principal_arn
+  value = data.aws_iam_role.voclabs_role.arn
 }
 
 output "cluster_ca_certificate" {
-  value       = aws_eks_cluster.eks-cluster.certificate_authority[0].data
+  value = aws_eks_cluster.eks-cluster.certificate_authority[0].data
 }
 
 output "cluster_token" {
-  value = data.aws_eks_cluster_auth.auth.token
+  value     = data.aws_eks_cluster_auth.auth.token
   sensitive = true
 }

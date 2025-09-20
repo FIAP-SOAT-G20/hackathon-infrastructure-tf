@@ -7,7 +7,9 @@ variable "project_name" {
 }
 
 variable "lab_role" {
-  default = "arn:aws:iam::905417995957:role/LabRole"
+  description = "Lab role ARN retrieved dynamically from AWS"
+  type        = string
+  default     = null
 }
 
 variable "access_config" {
@@ -23,7 +25,9 @@ variable "instance_type" {
 }
 
 variable "principal_arn" {
-  default = "arn:aws:iam::905417995957:role/voclabs"
+  description = "Principal ARN retrieved dynamically from AWS"
+  type        = string
+  default     = null
 }
 
 variable "policy_arn" {
