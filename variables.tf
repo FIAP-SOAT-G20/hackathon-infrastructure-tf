@@ -103,19 +103,18 @@ variable "sqs_queues" {
       message_retention_seconds   = 1209600 # 14 days
       visibility_timeout_seconds  = 60
       fifo_queue                  = false
-      content_based_deduplication = true
+      content_based_deduplication = false
       tags = {
         Purpose = "Receives an event from S3 when a video is uploaded"
       }
     }
     "notification" = {
-      name                        = "notification"
+      name                        = "video-status-notification.fifo"
       delay_seconds               = 0
       message_retention_seconds   = 1209600 # 14 days
       visibility_timeout_seconds  = 60
       fifo_queue                  = true
       content_based_deduplication = true
-      sns_topic_arn               = "arn:aws:sns:us-east-1:905417995957:video-status-updated"
       tags = {
         Purpose = "Receives an event from SNS when a video has it's status updated and sends a notification to users"
       }

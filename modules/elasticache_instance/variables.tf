@@ -78,12 +78,6 @@ variable "maintenance_window" {
   default     = "sun:05:00-sun:09:00"
 }
 
-variable "parameter_group_family" {
-  description = "Family of the parameter group"
-  type        = string
-  default     = null
-}
-
 variable "common_tags" {
   description = "Common tags to apply to all resources"
   type        = map(string)

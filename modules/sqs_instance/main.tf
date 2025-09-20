@@ -16,14 +16,11 @@ resource "aws_sqs_queue" "queues" {
 }
 
 resource "aws_sqs_queue_policy" "sns_to_sqs" {
-  for_each = {
-    for k, v in var.sqs_queues : k => v
-    if v.sns_topic_arn != null && v.sns_topic_arn != ""
-  }
+  for_each = var.sqs_queues
   
   queue_url = aws_sqs_queue.queues[each.key].id
 
-  policy = jsonencode({
+  policy = each.value.sns_topic_arn != null && each.value.sns_topic_arn != "" ? jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -41,5 +38,8 @@ resource "aws_sqs_queue_policy" "sns_to_sqs" {
         }
       }
     ]
+  }) : jsonencode({
+    Version = "2012-10-17"
+    Statement = []
   })
 }
