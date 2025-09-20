@@ -10,7 +10,9 @@ resource "aws_elasticache_subnet_group" "main" {
 
 resource "aws_elasticache_parameter_group" "main" {
   count       = var.parameter_group_name == null ? 1 : 0
-  family      = var.engine == "redis" ? "redis7.x" : "memcached1.6"
+  family      = var.parameter_group_family != null ? var.parameter_group_family : (
+    var.engine == "redis" ? "redis${split(".", var.engine_version)[0]}.x" : "memcached${split(".", var.engine_version)[0]}.${split(".", var.engine_version)[1]}"
+  )
   name        = "${var.project_name}-${var.environment}-${var.engine}-params"
   description = "Parameter group for ${var.engine} in ${var.project_name} project"
 
