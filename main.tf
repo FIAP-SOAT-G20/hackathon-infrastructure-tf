@@ -99,7 +99,7 @@ locals {
         sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"],
       } : {},
       key == "video-uploaded" ? {
-        s3_bucket_arn = "arn:aws:s3:::${var.s3_bucket_video_processor_raw_videos}",
+        s3_bucket_arn = "arn:aws:s3:::${var.s3_bucket_video_processor}",
       } : {}
     )
   }
@@ -120,7 +120,7 @@ module "s3_instance" {
 
   aws_region                  = var.aws_region
   environment                 = var.environment
-  s3_bucket_name              = var.s3_bucket_video_processor_raw_videos
+  s3_bucket_name              = var.s3_bucket_video_processor
   sqs_queue_arn               = module.sqs_instance.sqs_queue_arns["video-uploaded"]
   sqs_queue_policy_dependency = module.sqs_instance.s3_to_sqs_policies
 

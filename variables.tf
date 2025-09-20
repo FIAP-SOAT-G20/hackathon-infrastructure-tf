@@ -149,7 +149,7 @@ variable "sns_topics" {
   }
 }
 
-variable "s3_bucket_video_processor_raw_videos" {
+variable "s3_bucket_video_processor" {
   description = "Map of S3 bucket configurations"
   type        = string
   default     = "fiapx-10soat-g21"
