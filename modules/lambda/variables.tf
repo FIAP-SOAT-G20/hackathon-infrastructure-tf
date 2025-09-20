@@ -22,7 +22,7 @@ variable "lambda_memory" {
 variable "lambda_timeout" {
   description = "Lambda timeout in seconds"
   type        = number
-  default     = 30
+  default     = 60
 }
 
 variable "environment_variables" {

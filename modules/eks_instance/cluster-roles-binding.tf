@@ -9,6 +9,6 @@
       }
       subject {
         kind      = "ServiceAccount"
-        name      = "lambda-job-starter" # Name of the ServiceAccount
+        name      = kubernetes_service_account.lambda_job_starter.metadata[0].name
       }
     }
