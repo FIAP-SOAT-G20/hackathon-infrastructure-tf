@@ -18,13 +18,11 @@ variable "s3_bucket_name" {
 variable "sqs_queue_arn" {
   description = "ARN of the SQS queue that will receive messages from the S3 buckets"
   type        = string
-  default     = ""
 }
 
 variable "sqs_queue_url" {
   description = "URL of the SQS queue that will receive messages from the S3 buckets"
   type        = string
-  default     = ""
 }
 
 variable "common_tags" {

@@ -37,12 +37,6 @@ variable "log_retention_days" {
   default     = 14
 }
 
-variable "api_gateway_execution_arn" {
-  description = "API Gateway execution ARN for Lambda permission"
-  type        = string
-  default     = null
-}
-
 variable "common_tags" {
   description = "Common tags to apply to all resources"
   type = map(string)

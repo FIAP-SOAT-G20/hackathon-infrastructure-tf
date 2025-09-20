@@ -11,7 +11,7 @@ variable "environment" {
 }
 
 variable "topic_names" {
-  description = "Map of SQS queue configurations"
+  description = "Map of SNS topic configurations"
   type = map(object({
     name                          = string
     tags                         = optional(map(string))
