@@ -18,14 +18,19 @@ tf-init: ## Initialize Terraform
 	terraform init
 
 .PHONY: tf-plan
-tf-plan: ## Show Terraform plan
+tf-plan: ## Show Terraform plan and save to file
 	@echo  "🟢 Showing Terraform plan..."
-	terraform plan
+	terraform plan -out=tfplan
 
 .PHONY: tf-apply
-tf-apply: ## Apply Terraform
+tf-apply: ## Apply Terraform from saved plan
 	@echo  "🟢 Applying Terraform..."
-	terraform apply -auto-approve
+	terraform apply -input=false -auto-approve tfplan
+
+.PHONY: tf-apply-direct
+tf-apply-direct: ## Apply Terraform directly (without plan file)
+	@echo  "🟢 Applying Terraform directly..."
+	terraform apply -input=false -auto-approve
 
 .PHONY: tf-destroy
 tf-destroy: ## Destroy Terraform resources
