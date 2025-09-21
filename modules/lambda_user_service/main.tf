@@ -26,7 +26,6 @@ resource "aws_lambda_function" "user_service" {
     variables = merge(var.environment_variables, {
       USERS_TABLE_NAME = var.users_table_name
       IDS_TABLE_NAME   = var.ids_table_name
-      AWS_REGION       = var.aws_region
       # Parameter Store extension configuration
       PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL = "info"
       PARAMETERS_SECRETS_EXTENSION_CACHE_ENABLED = "true"
