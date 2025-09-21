@@ -132,7 +132,7 @@ The infrastructure supports different environments through variables:
 ### Backend Configuration
 
 The Terraform state is stored in an S3 backend:
-- **Bucket**: `video-terraform-state-soat-g21-hackathon`
+- **Bucket**: `tf-state-10soat-g21-hackathon`
 - **Key**: `terraform.tfstate`
 - **Region**: `us-east-1`
 
