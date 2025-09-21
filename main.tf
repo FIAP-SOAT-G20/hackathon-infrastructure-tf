@@ -27,12 +27,12 @@ provider "aws" {
 }
 
 data "aws_eks_cluster" "cluster" {
-  name = module.eks_instance.cluster_name
+  name       = module.eks_instance.cluster_name
   depends_on = [module.eks_instance]
 }
 
 data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks_instance.cluster_name
+  name       = module.eks_instance.cluster_name
   depends_on = [module.eks_instance]
 }
 
@@ -42,10 +42,12 @@ provider "kubernetes" {
   token                  = data.aws_eks_cluster_auth.cluster.token
 }
 
+# EKS for Kubernetes
 module "eks_instance" {
   source = "./modules/eks_instance"
 }
 
+# RDS for Relational Database
 module "rds_instance" {
   source = "./modules/rds_instance"
 
@@ -59,6 +61,7 @@ module "rds_instance" {
   depends_on = [module.eks_instance]
 }
 
+# Application Load Balancer for Video Service
 module "alb_instance" {
   source = "./modules/alb_instance"
 
@@ -70,6 +73,7 @@ module "alb_instance" {
   depends_on = [module.eks_instance]
 }
 
+# ElastiCache for Caching
 module "elasticache_instance" {
   source = "./modules/elasticache_instance"
 
@@ -85,18 +89,7 @@ module "elasticache_instance" {
   depends_on = [module.eks_instance]
 }
 
-module "lambda_instance" {
-  source = "./modules/lambda"
-
-  project_name     = var.project_name
-  environment      = var.environment
-  lambda_image_uri = var.lambda_image_uri
-  lambda_memory    = var.lambda_memory
-  lambda_timeout   = var.lambda_timeout
-
-}
-
-
+# SNS for Notifications
 module "sns_instance" {
   source = "./modules/sns_instance"
 
@@ -108,19 +101,20 @@ locals {
   transformed_sqs_queues = {
     for key, value in var.sqs_queues :
     key => merge(value,
-        key == "video-status-notification.fifo" ? {
+      key == "video-status-notification.fifo" ? {
         sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"],
       } : {},
-        key == "video-status-updated.fifo" ? {
+      key == "video-status-updated.fifo" ? {
         sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"],
       } : {},
-        key == "video-uploaded" ? {
+      key == "video-uploaded" ? {
         s3_bucket_arn = "arn:aws:s3:::${var.s3_bucket_video_processor_raw_videos}",
       } : {}
     )
   }
 }
 
+# SQS for Messaging
 module "sqs_instance" {
   source = "./modules/sqs_instance"
 
@@ -131,6 +125,7 @@ module "sqs_instance" {
 }
 
 
+# S3 for Video Storage
 module "s3_instance" {
   source = "./modules/s3_instance"
 
@@ -167,34 +162,45 @@ module "parameter_store" {
 module "lambda_user_service" {
   source = "./modules/lambda_user_service"
 
-  project_name                 = var.project_name
-  environment                  = var.environment
-  lambda_image_uri             = var.lambda_user_service_image_uri
-  lambda_memory                = var.lambda_user_service_memory
-  lambda_timeout               = var.lambda_user_service_timeout
-  users_table_name             = module.dynamodb_instance.users_table_name
-  ids_table_name               = module.dynamodb_instance.ids_table_name
-  aws_region                   = var.aws_region
-  jwt_secret_parameter_name    = module.parameter_store.jwt_secret_parameter_name
+  project_name                  = var.project_name
+  environment                   = var.environment
+  lambda_image_uri              = var.lambda_user_service_image_uri
+  lambda_memory                 = var.lambda_user_service_memory
+  lambda_timeout                = var.lambda_user_service_timeout
+  users_table_name              = module.dynamodb_instance.users_table_name
+  ids_table_name                = module.dynamodb_instance.ids_table_name
+  aws_region                    = var.aws_region
+  jwt_secret_parameter_name     = module.parameter_store.jwt_secret_parameter_name
   jwt_expiration_parameter_name = module.parameter_store.jwt_expiration_parameter_name
-  environment_variables        = var.lambda_user_service_environment_variables
-  common_tags                  = var.common_tags
+  environment_variables         = var.lambda_user_service_environment_variables
+  common_tags                   = var.common_tags
 
   depends_on = [module.dynamodb_instance, module.parameter_store]
 }
 
+# Lambda Job Starter
+module "lambda_job_starter" {
+  source = "./modules/lambda_job_starter"
+
+  project_name     = var.project_name
+  environment      = var.environment
+  lambda_image_uri = var.lambda_image_uri
+  lambda_memory    = var.lambda_memory
+  lambda_timeout   = var.lambda_timeout
+
+}
 
 # API Gateway for Services
 module "api_gateway_instance" {
   source = "./modules/api_gateway_instance"
 
-  project_name              = var.project_name
-  environment               = var.environment
-  stage_name                = var.api_gateway_stage_name
-  lambda_function_name      = module.lambda_user_service.lambda_function_name
-  lambda_invoke_arn         = module.lambda_user_service.lambda_invoke_arn
-  video_service_alb_dns     = module.alb_instance.alb_dns_name
-  common_tags               = var.common_tags
+  project_name          = var.project_name
+  environment           = var.environment
+  stage_name            = var.api_gateway_stage_name
+  lambda_function_name  = module.lambda_user_service.lambda_function_name
+  lambda_invoke_arn     = module.lambda_user_service.lambda_invoke_arn
+  video_service_alb_dns = module.alb_instance.alb_dns_name
+  common_tags           = var.common_tags
 
   depends_on = [module.lambda_user_service, module.alb_instance]
 }
