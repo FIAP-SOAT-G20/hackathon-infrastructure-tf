@@ -28,6 +28,11 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ env.REGION_DEFAULT }}
 
+      - name: Get AWS Account ID
+        run: |
+          AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID" >> $GITHUB_ENV
+
       - name: Terraform Setup
         uses: hashicorp/setup-terraform@v3
 
@@ -47,6 +52,7 @@ jobs:
       - name: Terraform Plan
         id: plan
         env:
+          TF_VAR_aws_account_id: ${{ env.AWS_ACCOUNT_ID }}
           TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
           TF_VAR_rds_db_password: ${{ secrets.RDS_DB_PASSWORD }}
           TF_VAR_rds_db_username: ${{ secrets.RDS_DB_USERNAME }}
