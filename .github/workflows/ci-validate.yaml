@@ -10,8 +10,8 @@ env:
   REGION_DEFAULT: us-east-1
 
 jobs:
-  create_infra:
-    name: CD - Create AWS Infra with Terraform
+  terraform_validate:
+    name: terraform validate
     runs-on: ubuntu-latest
 
     steps:
