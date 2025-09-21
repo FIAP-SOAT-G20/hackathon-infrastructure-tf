@@ -119,6 +119,17 @@ variable "sqs_queues" {
         Purpose = "Receives an event from SNS when a video has its status updated and sends a notification to users"
       }
     }
+    "video-status-updated.fifo" = {
+      name                        = "video-status-updated.fifo"
+      delay_seconds               = 0
+      message_retention_seconds   = 1209600 # 14 days
+      visibility_timeout_seconds  = 60
+      fifo_queue                  = true
+      content_based_deduplication = true
+      tags = {
+        Purpose = "Receives events when video status is updated"
+      }
+    }
   }
 }
 
@@ -131,15 +142,15 @@ variable "sns_topics" {
   default = {
     "video-status-updated" = {
       name = "video-status-updated"
-      tags = { 
+      tags = {
         Purpose = "Sends a notification to users when a video has its status updated"
       }
     }
   }
 }
 
-variable "s3_bucket_video_processor_raw_videos" {
+variable "s3_bucket_video_processor" {
   description = "Map of S3 bucket configurations"
-  type = string
-  default = "fiapx-10soat-g21"
+  type        = string
+  default     = "fiapx-10soat-g21"
 }
