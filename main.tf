@@ -27,12 +27,12 @@ provider "aws" {
 }
 
 data "aws_eks_cluster" "cluster" {
-  name = var.project_name
+  name = module.eks_instance.cluster_name
   depends_on = [module.eks_instance]
 }
 
 data "aws_eks_cluster_auth" "cluster" {
-  name = var.project_name
+  name = module.eks_instance.cluster_name
   depends_on = [module.eks_instance]
 }
 
