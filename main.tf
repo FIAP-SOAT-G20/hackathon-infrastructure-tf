@@ -92,13 +92,13 @@ locals {
   transformed_sqs_queues = {
     for key, value in var.sqs_queues :
     key => merge(value,
-      key == "video-status-notification.fifo" ? {
+        key == "video-status-notification.fifo" ? {
         sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"],
       } : {},
-      key == "video-status-updated.fifo" ? {
+        key == "video-status-updated.fifo" ? {
         sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"],
       } : {},
-      key == "video-uploaded" ? {
+        key == "video-uploaded" ? {
         s3_bucket_arn = "arn:aws:s3:::${var.s3_bucket_video_processor}",
       } : {}
     )
@@ -125,4 +125,47 @@ module "s3_instance" {
   sqs_queue_policy_dependency = module.sqs_instance.s3_to_sqs_policies
 
   depends_on = [module.sqs_instance]
+}
+
+# DynamoDB for User Service
+module "dynamodb_instance" {
+  source = "./modules/dynamodb_instance"
+
+  project_name = var.project_name
+  environment  = var.environment
+  common_tags  = var.common_tags
+}
+
+# Lambda User Service
+module "lambda_user_service" {
+  source = "./modules/lambda_user_service"
+
+  project_name         = var.project_name
+  environment          = var.environment
+  lambda_image_uri     = var.lambda_user_service_image_uri
+  lambda_memory        = var.lambda_user_service_memory
+  lambda_timeout       = var.lambda_user_service_timeout
+  users_table_name     = module.dynamodb_instance.users_table_name
+  ids_table_name       = module.dynamodb_instance.ids_table_name
+  aws_region           = var.aws_region
+  jwt_secret           = var.jwt_secret
+  jwt_expiration       = var.jwt_expiration
+  environment_variables = var.lambda_user_service_environment_variables
+  common_tags          = var.common_tags
+
+  depends_on = [module.dynamodb_instance]
+}
+
+# API Gateway for User Service
+module "api_gateway_instance" {
+  source = "./modules/api_gateway_instance"
+
+  project_name         = var.project_name
+  environment          = var.environment
+  stage_name           = var.api_gateway_stage_name
+  lambda_function_name = module.lambda_user_service.lambda_function_name
+  lambda_invoke_arn    = module.lambda_user_service.lambda_invoke_arn
+  common_tags          = var.common_tags
+
+  depends_on = [module.lambda_user_service]
 }
