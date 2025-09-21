@@ -20,6 +20,11 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "aws_account_id" {
+  description = "AWS Account ID"
+  type        = string
+}
+
 variable "common_tags" {
   description = "Common tags to apply to all resources"
   type        = map(string)
@@ -68,7 +73,6 @@ variable "elasticache_port" {
 variable "lambda_image_uri" {
   description = "URI of the Lambda container image"
   type        = string
-  default     = "905417995957.dkr.ecr.us-east-1.amazonaws.com/hackathon-lambda-job-starter:latest"
 }
 
 variable "lambda_memory" {
