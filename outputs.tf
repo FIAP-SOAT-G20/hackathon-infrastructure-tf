@@ -152,3 +152,14 @@ output "sqs_queue_arns" {
   description = "Map of SQS queue names to their ARNs"
   value       = module.sqs_instance.sqs_queue_arns
 }
+
+# Parameter Store Outputs
+output "jwt_secret_parameter_name" {
+  description = "Name of the JWT secret parameter in Parameter Store"
+  value       = module.parameter_store.jwt_secret_parameter_name
+}
+
+output "jwt_expiration_parameter_name" {
+  description = "Name of the JWT expiration parameter in Parameter Store"
+  value       = module.parameter_store.jwt_expiration_parameter_name
+}

@@ -99,7 +99,7 @@ locals {
         sns_topic_arn = module.sns_instance.sns_topic_arns["video-status-updated"],
       } : {},
         key == "video-uploaded" ? {
-        s3_bucket_arn = "arn:aws:s3:::${var.s3_bucket_video_processor}",
+        s3_bucket_arn = "arn:aws:s3:::${var.s3_bucket_video_processor_raw_videos}",
       } : {}
     )
   }
@@ -120,7 +120,7 @@ module "s3_instance" {
 
   aws_region                  = var.aws_region
   environment                 = var.environment
-  s3_bucket_name              = var.s3_bucket_video_processor
+  s3_bucket_name              = var.s3_bucket_video_processor_raw_videos
   sqs_queue_arn               = module.sqs_instance.sqs_queue_arns["video-uploaded"]
   sqs_queue_policy_dependency = module.sqs_instance.s3_to_sqs_policies
 
@@ -136,24 +136,35 @@ module "dynamodb_instance" {
   common_tags  = var.common_tags
 }
 
+# Parameter Store for Configuration
+module "parameter_store" {
+  source = "./modules/parameter_store"
+
+  project_name   = var.project_name
+  environment    = var.environment
+  jwt_secret     = var.jwt_secret
+  jwt_expiration = var.jwt_expiration
+  common_tags    = var.common_tags
+}
+
 # Lambda User Service
 module "lambda_user_service" {
   source = "./modules/lambda_user_service"
 
-  project_name         = var.project_name
-  environment          = var.environment
-  lambda_image_uri     = var.lambda_user_service_image_uri
-  lambda_memory        = var.lambda_user_service_memory
-  lambda_timeout       = var.lambda_user_service_timeout
-  users_table_name     = module.dynamodb_instance.users_table_name
-  ids_table_name       = module.dynamodb_instance.ids_table_name
-  aws_region           = var.aws_region
-  jwt_secret           = var.jwt_secret
-  jwt_expiration       = var.jwt_expiration
-  environment_variables = var.lambda_user_service_environment_variables
-  common_tags          = var.common_tags
+  project_name                 = var.project_name
+  environment                  = var.environment
+  lambda_image_uri             = var.lambda_user_service_image_uri
+  lambda_memory                = var.lambda_user_service_memory
+  lambda_timeout               = var.lambda_user_service_timeout
+  users_table_name             = module.dynamodb_instance.users_table_name
+  ids_table_name               = module.dynamodb_instance.ids_table_name
+  aws_region                   = var.aws_region
+  jwt_secret_parameter_name    = module.parameter_store.jwt_secret_parameter_name
+  jwt_expiration_parameter_name = module.parameter_store.jwt_expiration_parameter_name
+  environment_variables        = var.lambda_user_service_environment_variables
+  common_tags                  = var.common_tags
 
-  depends_on = [module.dynamodb_instance]
+  depends_on = [module.dynamodb_instance, module.parameter_store]
 }
 
 

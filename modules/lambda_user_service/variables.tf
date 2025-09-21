@@ -58,14 +58,12 @@ variable "aws_region" {
   type        = string
 }
 
-variable "jwt_secret" {
-  description = "JWT secret for token signing"
+variable "jwt_secret_parameter_name" {
+  description = "Name of the JWT secret parameter in Parameter Store"
   type        = string
-  sensitive   = true
 }
 
-variable "jwt_expiration" {
-  description = "JWT token expiration duration"
+variable "jwt_expiration_parameter_name" {
+  description = "Name of the JWT expiration parameter in Parameter Store"
   type        = string
-  default     = "24h"
 }

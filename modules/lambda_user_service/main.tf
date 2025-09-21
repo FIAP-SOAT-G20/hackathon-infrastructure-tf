@@ -19,12 +19,22 @@ resource "aws_lambda_function" "user_service" {
   memory_size   = var.lambda_memory
   timeout       = var.lambda_timeout
 
+  # AWS Parameters and Secrets Lambda Extension
+  layers = ["arn:aws:lambda:us-east-1:177933569100:layer:AWS-Parameters-and-Secrets-Lambda-Extension:11"]
+
   environment {
     variables = merge(var.environment_variables, {
       USERS_TABLE_NAME = var.users_table_name
       IDS_TABLE_NAME   = var.ids_table_name
-      JWT_SECRET       = var.jwt_secret
-      JWT_EXPIRATION   = var.jwt_expiration
+      AWS_REGION       = var.aws_region
+      # Parameter Store extension configuration
+      PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL = "info"
+      PARAMETERS_SECRETS_EXTENSION_CACHE_ENABLED = "true"
+      PARAMETERS_SECRETS_EXTENSION_CACHE_SIZE = "1000"
+      PARAMETERS_SECRETS_EXTENSION_CACHE_TTL = "300000"
+      # Map Parameter Store values to environment variables
+      JWT_SECRET     = var.jwt_secret_parameter_name
+      JWT_EXPIRATION = var.jwt_expiration_parameter_name
     })
   }
 
