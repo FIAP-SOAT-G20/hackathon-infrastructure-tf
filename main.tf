@@ -164,7 +164,7 @@ module "lambda_user_service" {
 
   project_name                  = var.project_name
   environment                   = var.environment
-  lambda_image_uri              = var.lambda_user_service_image_uri
+  lambda_image_uri              = "${var.aws_account_id}.dkr.ecr.us-east-1.amazonaws.com/user_lambda:latest"
   lambda_memory                 = var.lambda_user_service_memory
   lambda_timeout                = var.lambda_user_service_timeout
   users_table_name              = module.dynamodb_instance.users_table_name
@@ -184,7 +184,7 @@ module "lambda_job_starter" {
 
   project_name     = var.project_name
   environment      = var.environment
-  lambda_image_uri = var.lambda_image_uri
+  lambda_image_uri = "${var.aws_account_id}.dkr.ecr.us-east-1.amazonaws.com/hackathon-lambda-job-starter:latest"
   lambda_memory    = var.lambda_memory
   lambda_timeout   = var.lambda_timeout
 
