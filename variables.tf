@@ -68,7 +68,7 @@ variable "elasticache_port" {
 variable "lambda_image_uri" {
   description = "URI of the Lambda container image"
   type        = string
-  default     = "905417995957.dkr.ecr.us-east-1.amazonaws.com/hackathon-lambda-job-starter:latest"
+  default     = "910150574271.dkr.ecr.us-east-1.amazonaws.com/hackathon-lambda-job-starter:latest"
 }
 
 variable "lambda_memory" {
@@ -119,17 +119,6 @@ variable "sqs_queues" {
         Purpose = "Receives an event from SNS when a video has its status updated and sends a notification to users"
       }
     }
-    "video-status-updated.fifo" = {
-      name                        = "video-status-updated.fifo"
-      delay_seconds               = 0
-      message_retention_seconds   = 1209600 # 14 days
-      visibility_timeout_seconds  = 60
-      fifo_queue                  = true
-      content_based_deduplication = true
-      tags = {
-        Purpose = "Receives events when video status is updated"
-      }
-    }
   }
 }
 
@@ -142,15 +131,61 @@ variable "sns_topics" {
   default = {
     "video-status-updated" = {
       name = "video-status-updated"
-      tags = {
+      tags = { 
         Purpose = "Sends a notification to users when a video has its status updated"
       }
     }
   }
 }
 
-variable "s3_bucket_video_processor" {
+variable "s3_bucket_video_processor_raw_videos" {
   description = "Map of S3 bucket configurations"
+  type = string
+  default = "fiapx-10soat-g21"
+}
+
+# User Service Lambda Variables
+variable "lambda_user_service_image_uri" {
+  description = "URI of the User Service Lambda container image"
   type        = string
-  default     = "fiapx-10soat-g21"
+  default     = "910150574271.dkr.ecr.us-east-1.amazonaws.com/hackathon-user-lambda:latest"
+}
+
+variable "lambda_user_service_memory" {
+  description = "User Service Lambda memory in MB"
+  type        = number
+  default     = 512
+}
+
+variable "lambda_user_service_timeout" {
+  description = "User Service Lambda timeout in seconds"
+  type        = number
+  default     = 60
+}
+
+variable "lambda_user_service_environment_variables" {
+  description = "Environment variables for the User Service Lambda function"
+  type        = map(string)
+  default     = {}
+}
+
+# User Service JWT Configuration
+variable "jwt_secret" {
+  description = "JWT secret for token signing"
+  type        = string
+  sensitive   = true
+  default     = "your-secure-256-bit-secret-here-change-in-production"
+}
+
+variable "jwt_expiration" {
+  description = "JWT token expiration duration"
+  type        = string
+  default     = "24h"
+}
+
+# API Gateway Configuration
+variable "api_gateway_stage_name" {
+  description = "API Gateway stage name"
+  type        = string
+  default     = "prod"
 }

@@ -4,7 +4,7 @@
 [![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
 [![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
 
-This repository contains Terraform infrastructure code for the FIAP PostTech Hackathon project. It provisions a complete AWS cloud infrastructure including an EKS cluster, RDS PostgreSQL database, ElastiCache Redis cluster, Application Load Balancer (ALB), Lambda functions, SQS queues, SNS topics, and S3 buckets with best practices for security, scalability, and maintainability.
+This repository contains Terraform infrastructure code for the FIAP PostTech Hackathon project. It provisions a complete AWS cloud infrastructure including an EKS cluster, RDS PostgreSQL database, ElastiCache Redis cluster, and Application Load Balancer (ALB) with best practices for security, scalability, and maintainability.
 
 ## 📋 Table of Contents
 
@@ -25,14 +25,6 @@ This infrastructure includes the following AWS components:
 - **Amazon RDS PostgreSQL**: Managed relational database service
 - **Amazon ElastiCache Redis**: Managed in-memory caching service for improved application performance
 - **Application Load Balancer (ALB)**: Load balancer for distributing incoming traffic
-- **AWS Lambda**: Serverless compute functions for event-driven processing
-- **Amazon SQS**: Message queuing service for decoupling application components
-  - `video-uploaded`: Standard queue for S3 video upload events
-  - `video-status-notification.fifo`: FIFO queue for user notifications
-  - `video-status-updated.fifo`: FIFO queue for video status change events
-- **Amazon SNS**: Pub/Sub messaging service for notifications
-  - `video-status-updated`: Topic for video status change notifications
-- **Amazon S3**: Object storage for video files and assets
 - **VPC with Public/Private Subnets**: Network isolation and security
 - **Security Groups**: Network access control
 - **IAM Roles and Policies**: Identity and access management
@@ -58,21 +50,6 @@ This infrastructure includes the following AWS components:
 │  │                 │              │                 │      │
 │  └─────────────────┘              └─────────────────┘      │
 └─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│                    Messaging & Compute                     │
-│                                                             │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    │
-│  │     S3      │───▶│   Lambda    │───▶│     SQS     │    │
-│  │   Bucket    │    │  Functions  │    │   Queues    │    │
-│  └─────────────┘    └─────────────┘    └─────────────┘    │
-│                             │                 ▲           │
-│                             ▼                 │           │
-│                      ┌─────────────┐         │           │
-│                      │     SNS     │─────────┘           │
-│                      │   Topics    │                     │
-│                      └─────────────┘                     │
-└─────────────────────────────────────────────────────────────┘
 ```
 
 ## 📋 Prerequisites
@@ -92,11 +69,7 @@ Your AWS credentials should have permissions for:
 - EKS (Cluster management, Node groups)
 - RDS (Database instances)
 - ElastiCache (Cache clusters, Subnet groups, Parameter groups)
-- Lambda (Function creation, execution roles)
-- SQS (Queue creation and management)
-- SNS (Topic creation and subscriptions)
-- S3 (Bucket creation and notifications)
-- IAM (Roles and policies for services)
+- IAM (Roles and policies for EKS)
 - S3 (For Terraform state backend)
 
 ## 📁 Project Structure
@@ -116,13 +89,11 @@ Your AWS credentials should have permissions for:
     │   ├── sg.tf
     │   └── variables.tf
     ├── eks_instance/         # EKS cluster module
-    │   ├── cluster-roles-binding.tf
-    │   ├── cluster-roles.tf
     │   ├── data.tf
     │   ├── eks.tf
+    │   ├── kubernetes.tf
     │   ├── outputs.tf
     │   ├── provider.tf
-    │   ├── service-accounts.tf
     │   ├── sg.tf
     │   ├── variables.tf
     │   └── vpc.tf
@@ -132,23 +103,7 @@ Your AWS credentials should have permissions for:
     │   ├── provider.tf
     │   ├── sg.tf
     │   └── variables.tf
-    ├── lambda/               # AWS Lambda module
-    │   ├── main.tf
-    │   ├── outputs.tf
-    │   └── variables.tf
-    ├── rds_instance/         # RDS PostgreSQL module
-    │   ├── main.tf
-    │   ├── outputs.tf
-    │   └── variables.tf
-    ├── s3_instance/          # S3 bucket module
-    │   ├── main.tf
-    │   ├── outputs.tf
-    │   └── variables.tf
-    ├── sns_instance/         # SNS topics module
-    │   ├── main.tf
-    │   ├── outputs.tf
-    │   └── variables.tf
-    └── sqs_instance/         # SQS queues module
+    └── rds_instance/         # RDS PostgreSQL module
         ├── main.tf
         ├── outputs.tf
         └── variables.tf
@@ -171,12 +126,6 @@ The infrastructure supports different environments through variables:
 | `elasticache_engine` | ElastiCache engine (redis/memcached) | `redis` | No |
 | `elasticache_node_type` | ElastiCache node type | `cache.t3.micro` | No |
 | `elasticache_port` | ElastiCache port number | `6379` | No |
-| `lambda_image_uri` | Lambda container image URI | ECR image URI | Yes |
-| `lambda_memory` | Lambda memory allocation (MB) | `512` | No |
-| `lambda_timeout` | Lambda timeout (seconds) | `60` | No |
-| `sqs_queues` | SQS queue configurations | See variables.tf | No |
-| `sns_topics` | SNS topic configurations | See variables.tf | No |
-| `s3_bucket_video_processor` | S3 bucket name for video storage (raw/processed) | `fiapx-10soat-g21` | No |
 
 *Required in production environments. Use AWS Secrets Manager or similar for production deployments.
 
@@ -271,14 +220,6 @@ rds_db_password = "secure-password-here"
 elasticache_engine    = "redis"
 elasticache_node_type = "cache.t3.small"
 elasticache_port      = 6379
-
-# Lambda Configuration
-lambda_image_uri = "your-account.dkr.ecr.us-west-2.amazonaws.com/your-lambda:latest"
-lambda_memory    = 1024
-lambda_timeout   = 300
-
-# S3 Configuration
-s3_bucket_video_processor = "my-video-bucket"
 ```
 
 ## 📤 Outputs
@@ -306,22 +247,6 @@ After successful deployment, the following outputs are available:
 - `elasticache_cluster_address`: Cache cluster endpoint address
 - `elasticache_cluster_port`: Cache cluster port
 - `elasticache_engine`: Cache engine type (redis/memcached)
-
-### Lambda Functions
-- `lambda_function_name`: Lambda function name
-- `lambda_function_arn`: Lambda function ARN
-- `lambda_function_invoke_arn`: Lambda function invoke ARN
-
-### SQS Queues
-- `sqs_queue_arns`: Map of SQS queue ARNs by queue name
-- `sqs_queue_urls`: Map of SQS queue URLs by queue name
-
-### SNS Topics
-- `sns_topic_arns`: Map of SNS topic ARNs by topic name
-
-### S3 Buckets
-- `s3_bucket_name`: S3 bucket name for video storage
-- `s3_bucket_arn`: S3 bucket ARN
 
 View outputs after deployment:
 ```bash

@@ -89,6 +89,59 @@ output "s3_bucket_id" {
   value       = module.s3_instance.s3_bucket_id
 }
 
+# DynamoDB Outputs
+output "users_table_name" {
+  description = "Name of the users DynamoDB table"
+  value       = module.dynamodb_instance.users_table_name
+}
+
+output "users_table_arn" {
+  description = "ARN of the users DynamoDB table"
+  value       = module.dynamodb_instance.users_table_arn
+}
+
+output "ids_table_name" {
+  description = "Name of the IDs DynamoDB table"
+  value       = module.dynamodb_instance.ids_table_name
+}
+
+output "ids_table_arn" {
+  description = "ARN of the IDs DynamoDB table"
+  value       = module.dynamodb_instance.ids_table_arn
+}
+
+# User Service Lambda Outputs
+output "user_service_lambda_function_name" {
+  description = "Name of the User Service Lambda function"
+  value       = module.lambda_user_service.lambda_function_name
+}
+
+output "user_service_lambda_arn" {
+  description = "ARN of the User Service Lambda function"
+  value       = module.lambda_user_service.lambda_arn
+}
+
+output "user_service_lambda_invoke_arn" {
+  description = "Invoke ARN of the User Service Lambda function"
+  value       = module.lambda_user_service.lambda_invoke_arn
+}
+
+# API Gateway Outputs
+output "api_gateway_url" {
+  description = "URL of the User Service API Gateway"
+  value       = module.api_gateway_instance.api_gateway_url
+}
+
+output "api_gateway_id" {
+  description = "ID of the User Service API Gateway"
+  value       = module.api_gateway_instance.api_gateway_id
+}
+
+output "api_gateway_stage_name" {
+  description = "Stage name of the User Service API Gateway"
+  value       = module.api_gateway_instance.stage_name
+}
+
 # SQS Outputs
 output "sqs_queue_urls" {
   description = "Map of SQS queue names to their URLs"
@@ -98,4 +151,15 @@ output "sqs_queue_urls" {
 output "sqs_queue_arns" {
   description = "Map of SQS queue names to their ARNs"
   value       = module.sqs_instance.sqs_queue_arns
+}
+
+# Parameter Store Outputs
+output "jwt_secret_parameter_name" {
+  description = "Name of the JWT secret parameter in Parameter Store"
+  value       = module.parameter_store.jwt_secret_parameter_name
+}
+
+output "jwt_expiration_parameter_name" {
+  description = "Name of the JWT expiration parameter in Parameter Store"
+  value       = module.parameter_store.jwt_expiration_parameter_name
 }
