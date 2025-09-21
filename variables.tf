@@ -70,10 +70,6 @@ variable "elasticache_port" {
   type        = number
   default     = 6379
 }
-variable "lambda_image_uri" {
-  description = "URI of the Lambda container image"
-  type        = string
-}
 
 variable "lambda_memory" {
   description = "Lambda memory in MB"
@@ -146,13 +142,6 @@ variable "s3_bucket_video_processor_raw_videos" {
   description = "Map of S3 bucket configurations"
   type = string
   default = "fiapx-10soat-g21"
-}
-
-# User Service Lambda Variables
-variable "lambda_user_service_image_uri" {
-  description = "URI of the User Service Lambda container image"
-  type        = string
-  default     = "905417995957.dkr.ecr.us-east-1.amazonaws.com/hackathon-user-lambda:latest"
 }
 
 variable "lambda_user_service_memory" {
