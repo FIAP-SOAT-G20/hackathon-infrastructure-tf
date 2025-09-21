@@ -68,7 +68,7 @@ variable "elasticache_port" {
 variable "lambda_image_uri" {
   description = "URI of the Lambda container image"
   type        = string
-  default     = "910150574271.dkr.ecr.us-east-1.amazonaws.com/hackathon-lambda-job-starter:latest"
+  default     = "905417995957.dkr.ecr.us-east-1.amazonaws.com/hackathon-lambda-job-starter:latest"
 }
 
 variable "lambda_memory" {
@@ -148,7 +148,7 @@ variable "s3_bucket_video_processor_raw_videos" {
 variable "lambda_user_service_image_uri" {
   description = "URI of the User Service Lambda container image"
   type        = string
-  default     = "910150574271.dkr.ecr.us-east-1.amazonaws.com/hackathon-user-lambda:latest"
+  default     = "905417995957.dkr.ecr.us-east-1.amazonaws.com/hackathon-user-lambda:latest"
 }
 
 variable "lambda_user_service_memory" {
