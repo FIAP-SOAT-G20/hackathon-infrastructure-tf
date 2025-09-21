@@ -175,6 +175,10 @@ resource "aws_api_gateway_method" "me_get" {
   resource_id   = aws_api_gateway_resource.me_resource.id
   http_method   = "GET"
   authorization = "NONE"
+
+  request_parameters = {
+    "method.request.header.Authorization" = true
+  }
 }
 
 resource "aws_api_gateway_integration" "users_me_integration" {
