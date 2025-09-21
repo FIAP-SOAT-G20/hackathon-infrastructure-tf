@@ -127,17 +127,17 @@ output "user_service_lambda_invoke_arn" {
 }
 
 # API Gateway Outputs
-output "user_service_api_gateway_url" {
+output "api_gateway_url" {
   description = "URL of the User Service API Gateway"
   value       = module.api_gateway_instance.api_gateway_url
 }
 
-output "user_service_api_gateway_id" {
+output "api_gateway_id" {
   description = "ID of the User Service API Gateway"
   value       = module.api_gateway_instance.api_gateway_id
 }
 
-output "user_service_api_gateway_stage_name" {
+output "api_gateway_stage_name" {
   description = "Stage name of the User Service API Gateway"
   value       = module.api_gateway_instance.stage_name
 }

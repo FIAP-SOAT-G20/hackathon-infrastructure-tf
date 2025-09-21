@@ -24,6 +24,11 @@ variable "lambda_invoke_arn" {
   type        = string
 }
 
+variable "video_service_alb_dns" {
+  description = "DNS name of the ALB for video service"
+  type        = string
+}
+
 variable "common_tags" {
   description = "Common tags to apply to all resources"
   type        = map(string)

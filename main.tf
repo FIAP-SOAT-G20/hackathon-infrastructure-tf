@@ -156,16 +156,18 @@ module "lambda_user_service" {
   depends_on = [module.dynamodb_instance]
 }
 
-# API Gateway for User Service
+
+# API Gateway for Services
 module "api_gateway_instance" {
   source = "./modules/api_gateway_instance"
 
-  project_name         = var.project_name
-  environment          = var.environment
-  stage_name           = var.api_gateway_stage_name
-  lambda_function_name = module.lambda_user_service.lambda_function_name
-  lambda_invoke_arn    = module.lambda_user_service.lambda_invoke_arn
-  common_tags          = var.common_tags
+  project_name              = var.project_name
+  environment               = var.environment
+  stage_name                = var.api_gateway_stage_name
+  lambda_function_name      = module.lambda_user_service.lambda_function_name
+  lambda_invoke_arn         = module.lambda_user_service.lambda_invoke_arn
+  video_service_alb_dns     = module.alb_instance.alb_dns_name
+  common_tags               = var.common_tags
 
-  depends_on = [module.lambda_user_service]
+  depends_on = [module.lambda_user_service, module.alb_instance]
 }
