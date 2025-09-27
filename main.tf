@@ -187,7 +187,7 @@ module "lambda_job_starter" {
   lambda_image_uri = "${var.aws_account_id}.dkr.ecr.us-east-1.amazonaws.com/hackathon-lambda-job-starter:latest"
   lambda_memory    = var.lambda_memory
   lambda_timeout   = var.lambda_timeout
-
+  queue_arn        = module.sqs_instance.sqs_queue_arns["video-uploaded"]
 }
 
 # API Gateway for Services

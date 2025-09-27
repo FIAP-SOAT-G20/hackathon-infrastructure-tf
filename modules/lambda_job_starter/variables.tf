@@ -42,3 +42,8 @@ variable "common_tags" {
   type = map(string)
   default = {}
 }
+
+variable "queue_arn" {
+  description = "ARN of the queue that will trigger the Lambda function"
+  type        = string
+}
