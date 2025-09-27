@@ -184,7 +184,7 @@ module "lambda_job_starter" {
 
   project_name     = var.project_name
   environment      = var.environment
-  lambda_image_uri = "${var.aws_account_id}.dkr.ecr.us-east-1.amazonaws.com/hackathon-lambda-job-starter:latest"
+  lambda_image_uri = "${var.aws_account_id}.dkr.ecr.us-east-1.amazonaws.com/fiap-soat-g20/hackathon-job-starter-lambda:latest"
   lambda_memory    = var.lambda_memory
   lambda_timeout   = var.lambda_timeout
   queue_arn        = module.sqs_instance.sqs_queue_arns["video-uploaded"]
