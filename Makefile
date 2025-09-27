@@ -28,7 +28,7 @@ tf-plan: ## Show Terraform plan and save to file
 tf-apply: ## Apply Terraform from saved plan
 	@echo  "🟢 Applying Terraform..."
 	@echo "Using AWS Account ID: $(AWS_ACCOUNT_ID)"
-	@terraform apply -var "aws_account_id=$(AWS_ACCOUNT_ID)" -input=false -auto-approve tfplan
+	@terraform apply -input=false -auto-approve tfplan
 
 .PHONY: tf-apply-direct
 tf-apply-direct: ## Apply Terraform directly (without plan file)
