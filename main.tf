@@ -12,7 +12,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "tf-state-10soat-g21-hackathon"
+    bucket = "hackathon-10soat-g21-tf-state"
     key    = "terraform.tfstate"
     region = "us-east-1"
   }

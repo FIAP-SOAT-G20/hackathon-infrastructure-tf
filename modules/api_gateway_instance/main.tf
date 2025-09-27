@@ -20,13 +20,7 @@ resource "aws_api_gateway_deployment" "hackathon_deployment" {
     aws_api_gateway_integration.users_register_integration,
     aws_api_gateway_integration.users_login_integration,
     aws_api_gateway_integration.users_me_integration,
-    aws_api_gateway_integration.videos_get_integration,
-    aws_api_gateway_integration.videos_post_integration,
-    aws_api_gateway_integration.video_id_get_integration,
-    aws_api_gateway_integration.video_id_put_integration,
-    aws_api_gateway_integration.video_id_patch_integration,
-    aws_api_gateway_integration.video_id_delete_integration,
-    aws_api_gateway_integration.video_processed_get_integration,
+    aws_api_gateway_integration.videos_any_integration
   ]
 
   rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
@@ -38,28 +32,14 @@ resource "aws_api_gateway_deployment" "hackathon_deployment" {
       aws_api_gateway_resource.login_resource.id,
       aws_api_gateway_resource.me_resource.id,
       aws_api_gateway_resource.videos_resource.id,
-      aws_api_gateway_resource.video_id_resource.id,
-      aws_api_gateway_resource.video_processed_resource.id,
       aws_api_gateway_method.register_post.id,
       aws_api_gateway_method.login_post.id,
       aws_api_gateway_method.me_get.id,
-      aws_api_gateway_method.videos_get.id,
-      aws_api_gateway_method.videos_post.id,
-      aws_api_gateway_method.video_id_get.id,
-      aws_api_gateway_method.video_id_put.id,
-      aws_api_gateway_method.video_id_patch.id,
-      aws_api_gateway_method.video_id_delete.id,
-      aws_api_gateway_method.video_processed_get.id,
+      aws_api_gateway_method.videos_any.id,
       aws_api_gateway_integration.users_register_integration.id,
       aws_api_gateway_integration.users_login_integration.id,
       aws_api_gateway_integration.users_me_integration.id,
-      aws_api_gateway_integration.videos_get_integration.id,
-      aws_api_gateway_integration.videos_post_integration.id,
-      aws_api_gateway_integration.video_id_get_integration.id,
-      aws_api_gateway_integration.video_id_put_integration.id,
-      aws_api_gateway_integration.video_id_patch_integration.id,
-      aws_api_gateway_integration.video_id_delete_integration.id,
-      aws_api_gateway_integration.video_processed_get_integration.id,
+      aws_api_gateway_integration.videos_any_integration.id,
     ]))
   }
 
@@ -103,17 +83,18 @@ resource "aws_api_gateway_resource" "videos_resource" {
   path_part   = "videos"
 }
 
-resource "aws_api_gateway_resource" "video_id_resource" {
+resource "aws_api_gateway_resource" "videos_manager_resource" {
   rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
-  parent_id   = aws_api_gateway_resource.videos_resource.id
-  path_part   = "{id}"
+  parent_id   = aws_api_gateway_rest_api.hackathon_api.root_resource_id
+  path_part   = "videos-manager"
 }
 
-resource "aws_api_gateway_resource" "video_processed_resource" {
+resource "aws_api_gateway_resource" "video_proxy_resource" {
   rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
-  parent_id   = aws_api_gateway_resource.video_id_resource.id
-  path_part   = "processed"
+  parent_id   = aws_api_gateway_resource.videos_resource.id
+  path_part   = "{proxy+}"
 }
+
 
 resource "aws_api_gateway_resource" "register_resource" {
   rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
@@ -181,6 +162,13 @@ resource "aws_api_gateway_method" "me_get" {
   }
 }
 
+resource "aws_api_gateway_method" "videos_manager_any" {
+  rest_api_id   = aws_api_gateway_rest_api.hackathon_api.id
+  resource_id   = aws_api_gateway_resource.videos_manager_resource.id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
 resource "aws_api_gateway_integration" "users_me_integration" {
   rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
   resource_id = aws_api_gateway_resource.me_resource.id
@@ -209,179 +197,36 @@ resource "aws_api_gateway_integration" "users_integration" {
   uri                     = var.lambda_invoke_arn
 }
 
+# Video method
+resource "aws_api_gateway_method" "videos_any" {
+  rest_api_id   = aws_api_gateway_rest_api.hackathon_api.id
+  resource_id   = aws_api_gateway_resource.video_proxy_resource.id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
 # Video integrations
-resource "aws_api_gateway_integration" "videos_get_integration" {
+resource "aws_api_gateway_integration" "videos_any_integration" {
   rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id = aws_api_gateway_resource.videos_resource.id
-  http_method = aws_api_gateway_method.videos_get.http_method
+  resource_id = aws_api_gateway_resource.video_proxy_resource.id
+  http_method = aws_api_gateway_method.videos_any.http_method
 
-  integration_http_method = "GET"
+  integration_http_method = "ANY"
   type                    = "HTTP_PROXY"
   uri                     = "http://${var.video_service_alb_dns}/videos"
-
-  request_parameters = {
-    "integration.request.header.Authorization" = "method.request.header.Authorization"
-  }
 }
 
-resource "aws_api_gateway_integration" "videos_post_integration" {
+# Video Manager integrations
+resource "aws_api_gateway_integration" "video_manager_any_integration" {
   rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id = aws_api_gateway_resource.videos_resource.id
-  http_method = aws_api_gateway_method.videos_post.http_method
+  resource_id = aws_api_gateway_resource.video_proxy_resource.id
+  http_method = aws_api_gateway_method.videos_manager_any.http_method
 
-  integration_http_method = "POST"
+  integration_http_method = "ANY"
   type                    = "HTTP_PROXY"
-  uri                     = "http://${var.video_service_alb_dns}/videos"
-
-  request_parameters = {
-    "integration.request.header.Authorization" = "method.request.header.Authorization"
-  }
+  uri                     = "http://${var.video_service_alb_dns}/web"
 }
 
-resource "aws_api_gateway_integration" "video_id_get_integration" {
-  rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id = aws_api_gateway_resource.video_id_resource.id
-  http_method = aws_api_gateway_method.video_id_get.http_method
-
-  integration_http_method = "GET"
-  type                    = "HTTP_PROXY"
-  uri                     = "http://${var.video_service_alb_dns}/videos/{id}"
-
-  request_parameters = {
-    "integration.request.path.id" = "method.request.path.id"
-    "integration.request.header.Authorization" = "method.request.header.Authorization"
-  }
-}
-
-resource "aws_api_gateway_integration" "video_id_put_integration" {
-  rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id = aws_api_gateway_resource.video_id_resource.id
-  http_method = aws_api_gateway_method.video_id_put.http_method
-
-  integration_http_method = "PUT"
-  type                    = "HTTP_PROXY"
-  uri                     = "http://${var.video_service_alb_dns}/videos/{id}"
-
-  request_parameters = {
-    "integration.request.path.id" = "method.request.path.id"
-    "integration.request.header.Authorization" = "method.request.header.Authorization"
-  }
-}
-
-resource "aws_api_gateway_integration" "video_id_patch_integration" {
-  rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id = aws_api_gateway_resource.video_id_resource.id
-  http_method = aws_api_gateway_method.video_id_patch.http_method
-
-  integration_http_method = "PATCH"
-  type                    = "HTTP_PROXY"
-  uri                     = "http://${var.video_service_alb_dns}/videos/{id}"
-
-  request_parameters = {
-    "integration.request.path.id" = "method.request.path.id"
-    "integration.request.header.Authorization" = "method.request.header.Authorization"
-  }
-}
-
-resource "aws_api_gateway_integration" "video_id_delete_integration" {
-  rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id = aws_api_gateway_resource.video_id_resource.id
-  http_method = aws_api_gateway_method.video_id_delete.http_method
-
-  integration_http_method = "DELETE"
-  type                    = "HTTP_PROXY"
-  uri                     = "http://${var.video_service_alb_dns}/videos/{id}"
-
-  request_parameters = {
-    "integration.request.path.id" = "method.request.path.id"
-    "integration.request.header.Authorization" = "method.request.header.Authorization"
-  }
-}
-
-resource "aws_api_gateway_integration" "video_processed_get_integration" {
-  rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id = aws_api_gateway_resource.video_processed_resource.id
-  http_method = aws_api_gateway_method.video_processed_get.http_method
-
-  integration_http_method = "GET"
-  type                    = "HTTP_PROXY"
-  uri                     = "http://${var.video_service_alb_dns}/videos/{id}/processed"
-
-  request_parameters = {
-    "integration.request.path.id" = "method.request.path.id"
-    "integration.request.header.Authorization" = "method.request.header.Authorization"
-  }
-}
-
-# Videos methods
-resource "aws_api_gateway_method" "videos_get" {
-  rest_api_id   = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id   = aws_api_gateway_resource.videos_resource.id
-  http_method   = "GET"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_method" "videos_post" {
-  rest_api_id   = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id   = aws_api_gateway_resource.videos_resource.id
-  http_method   = "POST"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_method" "video_id_get" {
-  rest_api_id   = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id   = aws_api_gateway_resource.video_id_resource.id
-  http_method   = "GET"
-  authorization = "NONE"
-
-  request_parameters = {
-    "method.request.path.id" = true
-  }
-}
-
-resource "aws_api_gateway_method" "video_id_put" {
-  rest_api_id   = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id   = aws_api_gateway_resource.video_id_resource.id
-  http_method   = "PUT"
-  authorization = "NONE"
-
-  request_parameters = {
-    "method.request.path.id" = true
-  }
-}
-
-resource "aws_api_gateway_method" "video_id_patch" {
-  rest_api_id   = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id   = aws_api_gateway_resource.video_id_resource.id
-  http_method   = "PATCH"
-  authorization = "NONE"
-
-  request_parameters = {
-    "method.request.path.id" = true
-  }
-}
-
-resource "aws_api_gateway_method" "video_id_delete" {
-  rest_api_id   = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id   = aws_api_gateway_resource.video_id_resource.id
-  http_method   = "DELETE"
-  authorization = "NONE"
-
-  request_parameters = {
-    "method.request.path.id" = true
-  }
-}
-
-resource "aws_api_gateway_method" "video_processed_get" {
-  rest_api_id   = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id   = aws_api_gateway_resource.video_processed_resource.id
-  http_method   = "GET"
-  authorization = "NONE"
-
-  request_parameters = {
-    "method.request.path.id" = true
-  }
-}
 
 # CORS configuration
 resource "aws_api_gateway_method" "register_options" {
