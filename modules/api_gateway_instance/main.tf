@@ -20,7 +20,8 @@ resource "aws_api_gateway_deployment" "hackathon_deployment" {
     aws_api_gateway_integration.users_register_integration,
     aws_api_gateway_integration.users_login_integration,
     aws_api_gateway_integration.users_me_integration,
-    aws_api_gateway_integration.videos_any_integration
+    aws_api_gateway_integration.videos_any_integration,
+    aws_api_gateway_integration.video_manager_any_integration
   ]
 
   rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
@@ -32,14 +33,17 @@ resource "aws_api_gateway_deployment" "hackathon_deployment" {
       aws_api_gateway_resource.login_resource.id,
       aws_api_gateway_resource.me_resource.id,
       aws_api_gateway_resource.videos_resource.id,
+      aws_api_gateway_resource.videos_manager_resource.id,
       aws_api_gateway_method.register_post.id,
       aws_api_gateway_method.login_post.id,
       aws_api_gateway_method.me_get.id,
       aws_api_gateway_method.videos_any.id,
+      aws_api_gateway_method.videos_manager_any.id,
       aws_api_gateway_integration.users_register_integration.id,
       aws_api_gateway_integration.users_login_integration.id,
       aws_api_gateway_integration.users_me_integration.id,
       aws_api_gateway_integration.videos_any_integration.id,
+      aws_api_gateway_integration.video_manager_any_integration.id,
     ]))
   }
 
@@ -219,7 +223,7 @@ resource "aws_api_gateway_integration" "videos_any_integration" {
 # Video Manager integrations
 resource "aws_api_gateway_integration" "video_manager_any_integration" {
   rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id = aws_api_gateway_resource.video_proxy_resource.id
+  resource_id = aws_api_gateway_resource.videos_manager_resource.id
   http_method = aws_api_gateway_method.videos_manager_any.http_method
 
   integration_http_method = "ANY"
