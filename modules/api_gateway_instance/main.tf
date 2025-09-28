@@ -99,6 +99,12 @@ resource "aws_api_gateway_resource" "video_proxy_resource" {
   path_part   = "{proxy+}"
 }
 
+resource "aws_api_gateway_resource" "users_proxy_resource" {
+  rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
+  parent_id   = aws_api_gateway_resource.users_resource.id
+  path_part   = "{proxy+}"
+}
+
 
 resource "aws_api_gateway_resource" "register_resource" {
   rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
@@ -209,6 +215,25 @@ resource "aws_api_gateway_integration" "users_integration" {
   http_method = aws_api_gateway_method.users_any.http_method
 
   integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = var.lambda_invoke_arn
+}
+
+# Users method
+resource "aws_api_gateway_method" "users_any" {
+  rest_api_id   = aws_api_gateway_rest_api.hackathon_api.id
+  resource_id   = aws_api_gateway_resource.users_proxy_resource.id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+# Users integrations
+resource "aws_api_gateway_integration" "users_integration" {
+  rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
+  resource_id = aws_api_gateway_resource.users_proxy_resource.id
+  http_method = aws_api_gateway_method.users_any.http_method
+
+  integration_http_method = "ANY"
   type                    = "AWS_PROXY"
   uri                     = var.lambda_invoke_arn
 }
