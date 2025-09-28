@@ -228,7 +228,7 @@ resource "aws_api_gateway_integration" "users_proxy_integration" {
   resource_id = aws_api_gateway_resource.users_proxy_resource.id
   http_method = aws_api_gateway_method.users_proxy_any.http_method
 
-  integration_http_method = "ANY"
+  integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = var.lambda_invoke_arn
 }
