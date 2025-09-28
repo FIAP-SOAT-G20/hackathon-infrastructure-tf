@@ -181,18 +181,6 @@ module "lambda_user_service" {
   depends_on = [module.dynamodb_instance, module.parameter_store]
 }
 
-# Lambda Job Starter
-module "lambda_job_starter" {
-  source = "./modules/lambda_job_starter"
-
-  project_name     = var.project_name
-  environment      = var.environment
-  lambda_image_uri = "${var.aws_account_id}.dkr.ecr.us-east-1.amazonaws.com/fiap-soat-g20/hackathon-job-starter-lambda:latest"
-  lambda_memory    = var.lambda_memory
-  lambda_timeout   = var.lambda_timeout
-  queue_arn        = module.sqs_instance.sqs_queue_arns["video-uploaded"]
-}
-
 # API Gateway for Services
 module "api_gateway_instance" {
   source = "./modules/api_gateway_instance"
