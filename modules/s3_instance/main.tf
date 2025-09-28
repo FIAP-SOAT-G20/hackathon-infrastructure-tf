@@ -12,6 +12,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 
   queue {
     queue_arn = var.sqs_queue_arn
+    filter_prefix = "raw/"
     events    = ["s3:ObjectCreated:*"]
   }
 }
