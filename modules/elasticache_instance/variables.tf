@@ -26,6 +26,17 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "vpc_cidr_block" {
+  description = "VPC CIDR block for security group rules"
+  type        = string
+}
+
+variable "eks_security_group_id" {
+  description = "EKS security group ID to allow access from EKS nodes"
+  type        = string
+  default     = null
+}
+
 variable "engine" {
   description = "ElastiCache engine (redis or memcached)"
   type        = string

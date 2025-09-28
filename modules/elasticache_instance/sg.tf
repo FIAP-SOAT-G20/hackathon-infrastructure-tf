@@ -7,8 +7,20 @@ resource "aws_security_group" "elasticache_sg" {
     from_port   = var.port
     to_port     = var.port
     protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/8"] # Allow access from private subnets
+    cidr_blocks = [var.vpc_cidr_block] # Allow access from VPC CIDR
     description = "ElastiCache access from VPC"
+  }
+
+  # Allow access from EKS security group if provided
+  dynamic "ingress" {
+    for_each = var.eks_security_group_id != null ? [1] : []
+    content {
+      from_port       = var.port
+      to_port         = var.port
+      protocol        = "tcp"
+      security_groups = [var.eks_security_group_id]
+      description     = "ElastiCache access from EKS nodes"
+    }
   }
 
   egress {
