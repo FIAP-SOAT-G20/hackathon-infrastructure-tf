@@ -16,12 +16,13 @@ resource "aws_api_gateway_rest_api" "hackathon_api" {
 # API Gateway Deployment
 resource "aws_api_gateway_deployment" "hackathon_deployment" {
   depends_on = [
-    aws_api_gateway_integration.users_integration,
+    aws_api_gateway_integration.users_proxy_integration,
     aws_api_gateway_integration.users_register_integration,
     aws_api_gateway_integration.users_login_integration,
     aws_api_gateway_integration.users_me_integration,
     aws_api_gateway_integration.videos_any_integration,
-    aws_api_gateway_integration.video_manager_any_integration
+    aws_api_gateway_integration.video_manager_any_integration,
+    aws_api_gateway_integration.users_proxy_integration,
   ]
 
   rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
@@ -29,6 +30,7 @@ resource "aws_api_gateway_deployment" "hackathon_deployment" {
   triggers = {
     redeployment = sha1(jsonencode([
       aws_api_gateway_resource.users_resource.id,
+      aws_api_gateway_resource.users_proxy_resource.id,
       aws_api_gateway_resource.register_resource.id,
       aws_api_gateway_resource.login_resource.id,
       aws_api_gateway_resource.me_resource.id,
@@ -39,11 +41,14 @@ resource "aws_api_gateway_deployment" "hackathon_deployment" {
       aws_api_gateway_method.me_get.id,
       aws_api_gateway_method.videos_any.id,
       aws_api_gateway_method.videos_manager_any.id,
+      aws_api_gateway_method.users_proxy_any.id,
+      aws_api_gateway_integration.users_proxy_integration.id,
       aws_api_gateway_integration.users_register_integration.id,
       aws_api_gateway_integration.users_login_integration.id,
       aws_api_gateway_integration.users_me_integration.id,
       aws_api_gateway_integration.videos_any_integration.id,
       aws_api_gateway_integration.video_manager_any_integration.id,
+      aws_api_gateway_integration.users_proxy_integration.id,
     ]))
   }
 
@@ -96,6 +101,12 @@ resource "aws_api_gateway_resource" "videos_manager_resource" {
 resource "aws_api_gateway_resource" "video_proxy_resource" {
   rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
   parent_id   = aws_api_gateway_resource.videos_resource.id
+  path_part   = "{proxy+}"
+}
+
+resource "aws_api_gateway_resource" "users_proxy_resource" {
+  rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
+  parent_id   = aws_api_gateway_resource.users_resource.id
   path_part   = "{proxy+}"
 }
 
@@ -203,10 +214,19 @@ resource "aws_api_gateway_method" "users_any" {
   authorization = "NONE"
 }
 
-resource "aws_api_gateway_integration" "users_integration" {
+# Users method
+resource "aws_api_gateway_method" "users_proxy_any" {
+  rest_api_id   = aws_api_gateway_rest_api.hackathon_api.id
+  resource_id   = aws_api_gateway_resource.users_proxy_resource.id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+# Users integrations
+resource "aws_api_gateway_integration" "users_proxy_integration" {
   rest_api_id = aws_api_gateway_rest_api.hackathon_api.id
-  resource_id = aws_api_gateway_resource.users_resource.id
-  http_method = aws_api_gateway_method.users_any.http_method
+  resource_id = aws_api_gateway_resource.users_proxy_resource.id
+  http_method = aws_api_gateway_method.users_proxy_any.http_method
 
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
